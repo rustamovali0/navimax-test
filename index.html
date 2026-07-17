@@ -7,6 +7,8 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
 
     <style>
         * {
@@ -17,8 +19,8 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a0a0f;
-            color: #e8e8f0;
+            background: #f5f7fa;
+            color: #1a1a2e;
             padding: 20px;
             min-height: 100vh;
         }
@@ -28,36 +30,63 @@
             margin: 0 auto;
         }
 
+        /* Header - Ağ */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 16px 24px;
-            background: #12121a;
-            border: 1px solid #2a2a3e;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
         }
 
         .header h1 {
             font-size: 22px;
             font-weight: 700;
+            color: #1a1a2e;
         }
         .header h1 i {
             color: #4f8cf7;
             margin-right: 10px;
         }
         .header .subtitle {
-            color: #6a6a82;
+            color: #64748b;
             font-size: 13px;
         }
-        .header .subtitle .online {
-            color: #10b981;
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
         }
-        .header .subtitle .offline {
-            color: #ef4444;
+        .status-badge.online {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .status-badge.offline {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-badge.online .dot {
+            background: #16a34a;
+        }
+        .status-badge.offline .dot {
+            background: #dc2626;
         }
 
         .header-actions {
@@ -70,8 +99,8 @@
         .search-box {
             display: flex;
             align-items: center;
-            background: #0a0a0f;
-            border: 1px solid #2a2a3e;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
             padding: 6px 14px;
             gap: 10px;
@@ -80,24 +109,24 @@
             background: transparent;
             border: none;
             outline: none;
-            color: #e8e8f0;
+            color: #1a1a2e;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
             width: 200px;
         }
         .search-box input::placeholder {
-            color: #6a6a82;
+            color: #94a3b8;
         }
         .search-box i {
-            color: #6a6a82;
+            color: #94a3b8;
         }
 
         .btn {
             padding: 8px 18px;
             border-radius: 10px;
-            border: 1px solid #2a2a3e;
-            background: #0a0a0f;
-            color: #e8e8f0;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #1a1a2e;
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
@@ -108,7 +137,7 @@
             gap: 8px;
         }
         .btn:hover {
-            background: #1a1a2e;
+            background: #f1f5f9;
             border-color: #4f8cf7;
         }
         .btn-primary {
@@ -119,6 +148,7 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(79, 140, 247, 0.3);
+            background: linear-gradient(135deg, #3b7de0, #6d2fd6);
         }
         .btn-success {
             background: #10b981;
@@ -129,6 +159,7 @@
             background: #059669;
         }
 
+        /* Stats - Ağ */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -136,11 +167,12 @@
             margin-bottom: 20px;
         }
         .stat-box {
-            background: #12121a;
-            border: 1px solid #2a2a3e;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
             padding: 12px 16px;
             text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
         .stat-box .num {
             font-size: 24px;
@@ -148,7 +180,7 @@
         }
         .stat-box .label {
             font-size: 11px;
-            color: #6a6a82;
+            color: #64748b;
             margin-top: 2px;
         }
         .stat-box .num.green {
@@ -167,19 +199,21 @@
             color: #4f8cf7;
         }
 
+        /* Category Filter - Ağ */
         .category-filter {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
             margin-bottom: 16px;
             padding: 12px 16px;
-            background: #12121a;
-            border: 1px solid #2a2a3e;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
         .category-filter .filter-label {
-            color: #6a6a82;
+            color: #64748b;
             font-size: 13px;
             font-weight: 600;
             margin-right: 8px;
@@ -187,9 +221,9 @@
         .category-btn {
             padding: 6px 14px;
             border-radius: 8px;
-            border: 1px solid #2a2a3e;
-            background: #0a0a0f;
-            color: #6a6a82;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
             cursor: pointer;
             font-size: 12px;
             font-weight: 500;
@@ -198,9 +232,9 @@
             white-space: nowrap;
         }
         .category-btn:hover {
-            background: #1a1a2e;
+            background: #e2e8f0;
             border-color: #4f8cf7;
-            color: #e8e8f0;
+            color: #1a1a2e;
         }
         .category-btn.active {
             background: linear-gradient(135deg, #4f8cf7, #7c3aed);
@@ -208,7 +242,7 @@
             color: #fff;
         }
         .category-btn .count {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.08);
             padding: 0 6px;
             border-radius: 4px;
             font-size: 10px;
@@ -218,11 +252,13 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
+        /* Table - Ağ */
         .table-wrap {
-            background: #12121a;
-            border: 1px solid #2a2a3e;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         table {
@@ -232,31 +268,32 @@
         }
 
         thead {
-            background: #0a0a0f;
+            background: #f8fafc;
         }
         thead th {
             padding: 10px 14px;
             text-align: left;
             font-weight: 600;
-            color: #6a6a82;
+            color: #64748b;
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-            border-bottom: 1px solid #2a2a3e;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         tbody tr {
-            border-bottom: 1px solid #1a1a2e;
+            border-bottom: 1px solid #f1f5f9;
             transition: 0.2s;
         }
         tbody tr:hover {
-            background: #1a1a2e;
+            background: #f8fafc;
         }
         tbody td {
             padding: 10px 14px;
             vertical-align: middle;
         }
 
+        /* Custom Checkbox - Ağ */
         .checkbox-custom {
             display: flex;
             align-items: center;
@@ -269,13 +306,14 @@
         .checkbox-custom .checkmark {
             width: 20px;
             height: 20px;
-            border: 2px solid #3a3a4e;
+            border: 2px solid #cbd5e1;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: 0.2s;
             flex-shrink: 0;
+            background: #ffffff;
         }
         .checkbox-custom .checkmark i {
             font-size: 12px;
@@ -300,10 +338,11 @@
         }
         .tc-title {
             font-weight: 500;
+            color: #1a1a2e;
         }
         .tc-title small {
             display: block;
-            color: #6a6a82;
+            color: #64748b;
             font-weight: 400;
             font-size: 12px;
             margin-top: 2px;
@@ -311,20 +350,66 @@
         }
         .tc-category {
             font-size: 11px;
-            color: #6a6a82;
-            background: #0a0a0f;
+            color: #64748b;
+            background: #f1f5f9;
             padding: 2px 10px;
             border-radius: 12px;
             display: inline-block;
-            border: 1px solid #2a2a3e;
+            border: 1px solid #e2e8f0;
             margin-top: 4px;
         }
 
+        /* Badges - Ağ */
+        .badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge.passed {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .badge.failed {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .badge.blocked {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .badge.retest {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+        .badge.not-tested {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .badge.critical {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .badge.high {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .badge.medium {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .badge.low {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
         .td-select {
-            background: #0a0a0f;
-            border: 1px solid #2a2a3e;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
-            color: #e8e8f0;
+            color: #1a1a2e;
             padding: 4px 10px;
             font-size: 12px;
             font-family: 'Inter', sans-serif;
@@ -335,33 +420,34 @@
         .td-select:focus {
             outline: none;
             border-color: #4f8cf7;
+            box-shadow: 0 0 0 3px rgba(79, 140, 247, 0.1);
         }
         .td-select option {
-            background: #12121a;
-            color: #e8e8f0;
+            background: #ffffff;
+            color: #1a1a2e;
         }
 
         .td-select-priority {
             min-width: 90px;
         }
         .td-select-priority.critical {
-            border-color: #ef4444;
+            border-color: #fca5a5;
         }
         .td-select-priority.high {
-            border-color: #f59e0b;
+            border-color: #fcd34d;
         }
         .td-select-priority.medium {
-            border-color: #4f8cf7;
+            border-color: #93c5fd;
         }
         .td-select-priority.low {
-            border-color: #6a6a82;
+            border-color: #cbd5e1;
         }
 
         .bug-input {
-            background: #0a0a0f;
-            border: 1px solid #2a2a3e;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
-            color: #e8e8f0;
+            color: #1a1a2e;
             padding: 4px 10px;
             font-size: 12px;
             font-family: 'Inter', sans-serif;
@@ -371,15 +457,16 @@
         .bug-input:focus {
             outline: none;
             border-color: #4f8cf7;
+            box-shadow: 0 0 0 3px rgba(79, 140, 247, 0.1);
         }
         .bug-input::placeholder {
-            color: #4a4a5e;
+            color: #94a3b8;
         }
 
         .btn-delete {
             background: transparent;
             border: none;
-            color: #6a6a82;
+            color: #94a3b8;
             cursor: pointer;
             font-size: 14px;
             padding: 4px 8px;
@@ -388,28 +475,32 @@
         }
         .btn-delete:hover {
             color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
+            background: #fee2e2;
         }
 
         .empty-state {
             text-align: center;
             padding: 40px;
-            color: #6a6a82;
+            color: #94a3b8;
         }
         .empty-state i {
             font-size: 40px;
             margin-bottom: 12px;
             display: block;
         }
+        .empty-state h3 {
+            color: #64748b;
+        }
 
         .loading {
             text-align: center;
             padding: 40px;
-            color: #6a6a82;
+            color: #94a3b8;
         }
         .loading i {
             font-size: 32px;
             animation: spin 1s linear infinite;
+            color: #4f8cf7;
         }
         @keyframes spin {
             100% {
@@ -417,6 +508,7 @@
             }
         }
 
+        /* Toast - Ağ */
         .toast-container {
             position: fixed;
             bottom: 24px;
@@ -428,15 +520,15 @@
         }
         .toast {
             padding: 14px 20px;
-            background: #12121a;
-            border: 1px solid #2a2a3e;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             min-width: 280px;
             display: flex;
             align-items: center;
             gap: 12px;
             animation: slideIn 0.4s ease;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         .toast.success i {
             color: #10b981;
@@ -467,12 +559,13 @@
             }
         }
 
+        /* Modal - Ağ */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
             z-index: 2000;
             justify-content: center;
             align-items: center;
@@ -481,8 +574,8 @@
             display: flex;
         }
         .modal {
-            background: #12121a;
-            border: 1px solid #2a2a3e;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 14px;
             padding: 28px;
             max-width: 520px;
@@ -490,6 +583,7 @@
             max-height: 80vh;
             overflow-y: auto;
             animation: modalIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
         @keyframes modalIn {
             from {
@@ -510,12 +604,13 @@
         .modal-header h2 {
             font-size: 20px;
             font-weight: 700;
+            color: #1a1a2e;
         }
         .modal-close {
             background: transparent;
-            border: 1px solid #2a2a3e;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
-            color: #6a6a82;
+            color: #64748b;
             width: 36px;
             height: 36px;
             cursor: pointer;
@@ -523,8 +618,8 @@
             transition: 0.2s;
         }
         .modal-close:hover {
-            background: #1a1a2e;
-            color: #fff;
+            background: #f1f5f9;
+            color: #1a1a2e;
         }
         .form-group {
             margin-bottom: 14px;
@@ -533,7 +628,7 @@
             display: block;
             font-size: 13px;
             font-weight: 600;
-            color: #6a6a82;
+            color: #64748b;
             margin-bottom: 4px;
         }
         .form-group input,
@@ -541,10 +636,10 @@
         .form-group textarea {
             width: 100%;
             padding: 10px 14px;
-            background: #0a0a0f;
-            border: 1px solid #2a2a3e;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
-            color: #e8e8f0;
+            color: #1a1a2e;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
             transition: 0.2s;
@@ -554,6 +649,7 @@
         .form-group textarea:focus {
             outline: none;
             border-color: #4f8cf7;
+            box-shadow: 0 0 0 3px rgba(79, 140, 247, 0.1);
         }
         .form-group textarea {
             resize: vertical;
@@ -570,7 +666,7 @@
             justify-content: flex-end;
             margin-top: 18px;
             padding-top: 14px;
-            border-top: 1px solid #1a1a2e;
+            border-top: 1px solid #e2e8f0;
         }
         .form-actions button {
             padding: 10px 24px;
@@ -582,13 +678,13 @@
             transition: 0.2s;
         }
         .btn-secondary {
-            background: #0a0a0f;
-            color: #6a6a82;
-            border: 1px solid #2a2a3e;
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
         }
         .btn-secondary:hover {
-            background: #1a1a2e;
-            color: #fff;
+            background: #e2e8f0;
+            color: #1a1a2e;
         }
         .btn-primary-modal {
             background: linear-gradient(135deg, #4f8cf7, #7c3aed);
@@ -598,39 +694,6 @@
         .btn-primary-modal:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(79, 140, 247, 0.3);
-        }
-
-        .sync-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #6a6a82;
-        }
-        .sync-status .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .sync-status .dot.online {
-            background: #10b981;
-        }
-        .sync-status .dot.offline {
-            background: #ef4444;
-        }
-        .sync-status .dot.syncing {
-            background: #f59e0b;
-            animation: pulse 0.8s infinite;
-        }
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.3;
-            }
         }
 
         @media (max-width: 768px) {
@@ -697,11 +760,14 @@
         <div class="header">
             <div>
                 <h1><i class="fas fa-clipboard-check"></i> NaviMax QA Checklist</h1>
-                <div class="subtitle">
-                    <span id="statusText">Yüklənir...</span>
-                    <span class="sync-status" id="syncStatus">
-                        <span class="dot" id="syncDot"></span>
-                        <span id="syncLabel">Yüklənir...</span>
+                <div class="subtitle" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px;">
+                    <span id="connectionStatus" class="status-badge online">
+                        <span class="dot"></span>
+                        <span id="statusText">Supabase ilə sinxron</span>
+                    </span>
+                    <span id="syncInfo" style="font-size:12px;color:#64748b;">
+                        <i class="fas fa-database"></i>
+                        <span id="dataCount">0</span> test case
                     </span>
                 </div>
             </div>
@@ -713,8 +779,8 @@
                 <button class="btn btn-primary" id="addBtn">
                     <i class="fas fa-plus"></i> Yeni Test
                 </button>
-                <button class="btn btn-success" id="syncBtn">
-                    <i class="fas fa-cloud-upload-alt"></i> Sync
+                <button class="btn btn-success" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Yenilə
                 </button>
             </div>
         </div>
@@ -726,7 +792,7 @@
             <div class="stat-box"><div class="num red" id="failed">0</div><div class="label">❌ Uğursuz</div></div>
             <div class="stat-box"><div class="num yellow" id="blocked">0</div><div class="label">🚫 Bloklanıb</div></div>
             <div class="stat-box"><div class="num purple" id="retest">0</div><div class="label">🔄 Retest</div></div>
-            <div class="stat-box"><div class="num" id="notTested" style="color:#6a6a82;">0</div><div class="label">⏳ Edilməyib</div></div>
+            <div class="stat-box"><div class="num" id="notTested" style="color:#64748b;">0</div><div class="label">⏳ Edilməyib</div></div>
         </div>
 
         <!-- Category Filter -->
@@ -839,19 +905,11 @@
         const SUPABASE_URL = 'https://vqdzohcztqztnsqbptfm.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_vHOZFaQlWoJ1epmGcfB9lw_Zn2v27v2';
 
-        let supabase = null;
-        let isSupabaseAvailable = false;
-
-        try {
-            supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            isSupabaseAvailable = true;
-        } catch (e) {
-            console.warn('Supabase client yaradılmadı:', e);
-            isSupabaseAvailable = false;
-        }
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase client yaradıldı');
 
         // ============================================================
-        // CATEGORIES (SABİT)
+        // CATEGORIES
         // ============================================================
         const categories = [
             { id: 'Login / Register', icon: '🔐', label: 'Login / Register' },
@@ -867,246 +925,34 @@
         ];
 
         // ============================================================
-        // DEFAULT TEST CASES
-        // ============================================================
-        const defaultTestCases = [
-            { tc_id: 'TC-001', title: 'Düzgün telefon nömrəsi ilə giriş', description: 'İstifadəçi düzgün nömrə ilə daxil olur',
-                category: 'Login / Register', status: 'not-tested', priority: 'critical', bug_id: null },
-            { tc_id: 'TC-002', title: 'İnternet olmadan giriş', description: 'İnternet bağlantısı olmadan giriş cəhdi',
-                category: 'Login / Register', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-003', title: 'Düzgün OTP ilə giriş', description: 'İstifadəçi düzgün OTP kodunu daxil edir',
-                category: 'Login / Register', status: 'not-tested', priority: 'critical', bug_id: null },
-            { tc_id: 'TC-004', title: 'Yanlış OTP daxil edilməsi', description: 'Səhv OTP kodu daxil edilir',
-                category: 'Login / Register', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-005', title: 'Boş telefon nömrəsi', description: 'Telefon nömrəsi boş göndərilir',
-                category: 'Login / Register', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-006', title: 'Boş OTP', description: 'OTP sahəsi boş göndərilir', category: 'Login / Register',
-                status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-007', title: 'Sessiyanın yaradılması', description: 'Uğurlu girişdən sonra sessiya yaranır',
-                category: 'Login / Register', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-008', title: 'Logout sonrası yenidən giriş', description: 'Çıxış edib yenidən daxil olma',
-                category: 'Login / Register', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-009', title: 'Obyekti silib yenidən daxil olma', description: 'Obyekt silindikdən sonra yenidən giriş',
-                category: 'Login / Register', status: 'not-tested', priority: 'low', bug_id: null },
-            { tc_id: 'TC-010', title: 'Loading ekranı', description: 'Ana səhifə yüklənərkən loading göstərilir',
-                category: 'Ana səhifə', status: 'not-tested', priority: 'low', bug_id: null },
-            { tc_id: 'TC-011', title: 'Ana səhifənin açılması', description: 'Dashboard məlumatları yüklənir',
-                category: 'Ana səhifə', status: 'not-tested', priority: 'critical', bug_id: null },
-            { tc_id: 'TC-012', title: 'Dashboard məlumatlarının yüklənməsi', description: 'Bütün dashboard widget-ları yüklənir',
-                category: 'Ana səhifə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-013', title: 'İnternet olmadan açılması', description: 'Offline rejimdə ana səhifə',
-                category: 'Ana səhifə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-014', title: 'İnternet aktiv olduğu halda yanlış Internet Error göstərməməsi',
-                description: 'Internet olduğu halda error göstərilmir', category: 'Ana səhifə', status: 'not-tested',
-                priority: 'high', bug_id: null },
-            { tc_id: 'TC-015', title: 'Wi-Fi-dan Mobil Dataya keçid zamanı stabil yenilənmə',
-                description: 'Şəbəkə dəyişikliyində məlumatlar yenilənir', category: 'Ana səhifə', status: 'not-tested',
-                priority: 'medium', bug_id: null },
-            { tc_id: 'TC-016', title: 'Server gec cavab verdikdə Loading və Error state',
-                description: 'Gecikmədə düzgün state idarəsi', category: 'Ana səhifə', status: 'not-tested', priority: 'medium',
-                bug_id: null },
-            { tc_id: 'TC-017', title: 'Obyektlər hissəsində yalnız seçilən obyektlərin görünməsi',
-                description: 'Filtr işləyir', category: 'Ana səhifə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-018', title: 'Mənim obyektimin həmişə seçili olması', description: 'Default seçilmiş obyekt',
-                category: 'Ana səhifə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-019', title: 'Seçilməyən obyektə obyektlər hissəsində daxil olanda görünməsi',
-                description: 'Başqa obyekt seçimi', category: 'Ana səhifə', status: 'not-tested', priority: 'low',
-                bug_id: null },
-            { tc_id: 'TC-020', title: 'Xəritənin açılması', description: 'Google Maps düzgün yüklənir', category: 'Xəritə',
-                status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-021', title: 'Cari mövqenin göstərilməsi', description: 'İstifadəçinin cari mövqeyi göstərilir',
-                category: 'Xəritə', status: 'not-tested', priority: 'critical', bug_id: null },
-            { tc_id: 'TC-022', title: 'Zoom In', description: 'Zoom In funksiyası işləyir', category: 'Xərită',
-                status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-023', title: 'Zoom Out', description: 'Zoom Out funksiyası işləyir', category: 'Xəritə',
-                status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-024', title: 'Peyk görünüşü', description: 'Satellite view keçidi', category: 'Xəritə',
-                status: 'not-tested', priority: 'low', bug_id: null },
-            { tc_id: 'TC-025', title: 'Markerlərin görünməsi', description: 'Bütün markerlər göstərilir', category: 'Xəritə',
-                status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-026', title: 'İnternet bərpa olunduqdan sonra markerlərin yenilənməsi',
-                description: 'Online olduqda markerlər yenilənir', category: 'Xəritə', status: 'not-tested', priority: 'high',
-                bug_id: null },
-            { tc_id: 'TC-027', title: 'Refresh sonrası seçilmiş obyektin koordinatının qorunması',
-                description: 'Refresh-də obyekt qorunur', category: 'Xəritə', status: 'not-tested', priority: 'medium',
-                bug_id: null },
-            { tc_id: 'TC-028', title: 'Cluster + Zoom + Marker seçiminin birlikdə işləməsi',
-                description: 'Kompleks interaksiya', category: 'Xəritə', status: 'not-tested', priority: 'high',
-                bug_id: null },
-            { tc_id: 'TC-029', title: 'Eyni koordinatda bir neçə obyekt olduqda "Mənim obyekti göstər"',
-                description: 'Cluster-də obyekt seçimi', category: 'Xəritə', status: 'not-tested', priority: 'medium',
-                bug_id: null },
-            { tc_id: 'TC-030', title: '"Mənim obyekti göstər" seçildikdə cluster markerinin titrəməməsi',
-                description: 'Flicker problemi yoxdur', category: 'Xəritə', status: 'not-tested', priority: 'medium',
-                bug_id: null },
-            { tc_id: 'TC-031', title: 'Başqa obyekt seçildikdən sonra "Mənim obyekti göstər" funksiyası',
-                description: 'Obyekt fokuslanır', category: 'Xəritə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-032', title: '"Mənim obyekti göstər" seçildikdə obyektin xəritədə görünməsi',
-                description: 'Obyekt xəritədə göstərilir', category: 'Xəritə', status: 'not-tested', priority: 'high',
-                bug_id: null },
-            { tc_id: 'TC-033', title: 'Obyekt profil şəklinin marker üzərində göstərilməsi',
-                description: 'Avatar marker-də göstərilir', category: 'Xəritə', status: 'not-tested', priority: 'low',
-                bug_id: null },
-            { tc_id: 'TC-034', title: 'Obyektlər siyahısından seçilən obyekt cluster daxilindədirsə avtomatik zoom',
-                description: 'Cluster-dən seçim', category: 'Xəritə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-035', title: 'Cluster daxilində seçilmiş obyektin fokuslanması', description: 'Cluster-dən fokus',
-                category: 'Xəritə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-036', title: 'Yeni yaradılan obyektin xəritədə gecikmədən görünməsi',
-                description: 'Real-time obyekt əlavəsi', category: 'Xəritə', status: 'not-tested', priority: 'high',
-                bug_id: null },
-            { tc_id: 'TC-037', title: 'Obyekt siyahısı', description: 'Bütün obyektlər siyahıda göstərilir',
-                category: 'Obyektlər', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-038', title: 'Obyekt axtarışı', description: 'Obyektlər arasında axtarış işləyir',
-                category: 'Obyektlər', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-039', title: 'Obyekt filtri', description: 'Filter funksiyası işləyir', category: 'Obyektlər',
-                status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-040', title: 'Obyekt seçilməsi', description: 'Obyekt seçimi işləyir', category: 'Obyektlər',
-                status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-041', title: 'Obyekt statusu', description: 'Obyekt statusu göstərilir', category: 'Obyektlər',
-                status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-042', title: 'Obyekt seçilib background-a göndərildikdən sonra fokusun qorunması',
-                description: 'Background-dan qayıdanda fokus qorunur', category: 'Obyektlər', status: 'not-tested',
-                priority: 'low', bug_id: null },
-            { tc_id: 'TC-043', title: 'Tətbiq kill edilib yenidən açıldıqda son seçilmiş obyektin bərpa olunması',
-                description: 'Kill-dən sonra bərpa', category: 'Obyektlər', status: 'not-tested', priority: 'medium',
-                bug_id: null },
-            { tc_id: 'TC-044', title: 'Yeni yaradılan obyektin siyahıda gecikmədən görünməsi',
-                description: 'Real-time əlavə', category: 'Obyektlər', status: 'not-tested', priority: 'high',
-                bug_id: null },
-            { tc_id: 'TC-045', title: 'Bir-birinə yaxın obyektlər seçildikdə düzgün cluster davranışı',
-                description: 'Cluster davranışı', category: 'Obyektlər', status: 'not-tested', priority: 'medium',
-                bug_id: null },
-            { tc_id: 'TC-046', title: 'İlk login zamanı yaradılan obyektlə sonradan yaradılan obyektin eyni qaydada görünməsi',
-                description: 'Obyekt ardıcıllığı', category: 'Obyektlər', status: 'not-tested', priority: 'low',
-                bug_id: null },
-            { tc_id: 'TC-047', title: 'Obyekt silindikdən sonra cache-də köhnə məlumatın qalmaması',
-                description: 'Cache təmizlənməsi', category: 'Obyektlər', status: 'not-tested', priority: 'high',
-                bug_id: null },
-            { tc_id: 'TC-048', title: 'Eyni adda obyekt silinib yenidən yaradıldıqda düzgün davranış',
-                description: 'Yenidən yaratma', category: 'Obyektlər', status: 'not-tested', priority: 'medium',
-                bug_id: null },
-            { tc_id: 'TC-049', title: 'Tarixçə səhifəsinin açılması', description: 'Tarixçə səhifəsi açılır',
-                category: 'Tarixçə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-050', title: 'Auto Refresh', description: 'Tarixçə avtomatik yenilənir', category: 'Tarixçə',
-                status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-051', title: 'Hərəkət tarixçəsi', description: 'Hərəkət məlumatları göstərilir',
-                category: 'Tarixçə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-052', title: 'Dayanma tarixçəsi', description: 'Dayanma məlumatları göstərilir',
-                category: 'Tarixçə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-053', title: 'GPS Error tarixçəsi', description: 'GPS xətaları göstərilir', category: 'Tarixçə',
-                status: 'not-tested', priority: 'low', bug_id: null },
-            { tc_id: 'TC-054', title: 'İnternet olmadıqda Connection Error-un düzgün göstərilməsi',
-                description: 'Offline xətası', category: 'Tarixçə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-055', title: 'İnternet bərpa olunduqda köhnə Error mesajının silinməsi',
-                description: 'Error təmizlənməsi', category: 'Tarixçə', status: 'not-tested', priority: 'medium',
-                bug_id: null },
-            { tc_id: 'TC-056', title: 'İnternet bərpa olunduqda məlumatların avtomatik yenilənməsi',
-                description: 'Auto refresh online', category: 'Tarixçə', status: 'not-tested', priority: 'high',
-                bug_id: null },
-            { tc_id: 'TC-057', title: 'Uzun məsafəli hərəkət tarixçəsinin düzgün açılması', description: 'Uzun marşrut',
-                category: 'Tarixçə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-058', title: 'Uzun marşrut xəritəsində scroll/pan zamanı donma və kəsilmələrin olmaması',
-                description: 'Performans', category: 'Tarixçə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-059', title: 'Canlı sürət', description: 'Real vaxtda sürət göstərilir', category: 'Maşın İzləmə',
-                status: 'not-tested', priority: 'critical', bug_id: null },
-            { tc_id: 'TC-060', title: 'Engine ON/OFF', description: 'Mühərrik vəziyyəti göstərilir',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-061', title: 'Yanacaq səviyyəsi', description: 'Yanacaq səviyyəsi göstərilir',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-062', title: 'Hard Brake', description: 'Hard brake hadisələri qeydə alınır',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'critical', bug_id: null },
-            { tc_id: 'TC-063', title: 'Hard Turn', description: 'Hard turn hadisələri qeydə alınır',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'critical', bug_id: null },
-            { tc_id: 'TC-064', title: 'Parking', description: 'Parking vəziyyəti göstərilir', category: 'Maşın İzləmə',
-                status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-065', title: 'Obyektin real vaxtda xəritədə hərəkəti', description: 'Real-time tracking',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'critical', bug_id: null },
-            { tc_id: 'TC-066', title: 'Sürətin düzgün göstərilməsi', description: 'Sürət dəqiqliyi',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-067', title: 'Refresh olmadan koordinatların yenilənməsi', description: 'Real-time yenilənmə',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-068', title: 'Başqa cihazdan refresh edilmədən sinxronizasiya', description: 'Multi-device sync',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-069', title: 'Android və iOS koordinatlarının eyni olması', description: 'Platforma uyğunluğu',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-070', title: 'Offline → Online keçiddə statusun yenilənməsi', description: 'Status dəyişikliyi',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-071', title: 'Zəif internetdə köhnə koordinatda donmaması', description: 'Zəif şəbəkə davranışı',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-072', title: 'Telefon obyektlərində sürət məlumatının göstərilməsi', description: 'Telefon tracking',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-073', title: 'Telefon və maşın obyektlərində eyni davranış', description: 'Obyekt tipləri',
-                category: 'Maşın İzləmə', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-074', title: 'Online olsa belə obyektin köhnə koordinatda qalmaması',
-                description: 'Koordinat yenilənməsi', category: 'Maşın İzləmə', status: 'not-tested', priority: 'critical',
-                bug_id: null },
-            { tc_id: 'TC-075', title: 'Online obyektin sürət məlumatının real vaxtda yenilənməsi',
-                description: 'Sürət real-time', category: 'Maşın İzləmə', status: 'not-tested', priority: 'high',
-                bug_id: null },
-            { tc_id: 'TC-076', title: 'Bildirişlər səhifəsinin açılması', description: 'Bildirişlər siyahısı açılır',
-                category: 'Bildirişlər', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-077', title: 'Obyekt əlavə etmə hissəsində profil şəklinin UI elementlərinin üstünə düşməməsi',
-                description: 'UI z-index problemi', category: 'Bildirişlər', status: 'not-tested', priority: 'low',
-                bug_id: null },
-            { tc_id: 'TC-078', title: 'Müxtəlif ekran ölçülərində UI elementlərinin düzgün yerləşməsi',
-                description: 'Responsive dizayn', category: 'Bildirişlər', status: 'not-tested', priority: 'medium',
-                bug_id: null },
-            { tc_id: 'TC-079', title: 'Kart əlavə etmə ekranının açılması', description: 'Kart əlavə etmə ekranı açılır',
-                category: 'Kart', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-080', title: 'Kart əlavə edilərkən ekranın avtomatik aşağı scroll etməməsi',
-                description: 'Scroll problemi', category: 'Kart', status: 'not-tested', priority: 'low', bug_id: null },
-            { tc_id: 'TC-081', title: 'Keyboard açıldıqda input fokusunun pozulmaması', description: 'Keyboard focus',
-                category: 'Kart', status: 'not-tested', priority: 'medium', bug_id: null },
-            { tc_id: 'TC-082', title: 'Balans artırılarkən maksimum limitin tətbiqi', description: 'Limit tətbiqi',
-                category: 'Balans', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-083', title: 'Limit aşılarkən düzgün xəbərdarlıq göstərilməsi', description: 'Limit xəbərdarlığı',
-                category: 'Balans', status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-084', title: 'Hesabdan çıxış', description: 'Logout funksiyası işləyir', category: 'Logout',
-                status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-085', title: 'Sessiyanın silinməsi', description: 'Session təmizlənir', category: 'Logout',
-                status: 'not-tested', priority: 'critical', bug_id: null },
-            { tc_id: 'TC-086', title: 'Yenidən giriş', description: 'Logout-dan sonra yenidən giriş', category: 'Logout',
-                status: 'not-tested', priority: 'high', bug_id: null },
-            { tc_id: 'TC-087', title: 'Logout sonrası cache və seçilmiş obyektlərin silinməsi',
-                description: 'Cache təmizlənməsi', category: 'Logout', status: 'not-tested', priority: 'high',
-                bug_id: null },
-            { tc_id: 'TC-088', title: 'Logout sonrası xəritə və obyekt siyahısının təmiz vəziyyətdə açılması',
-                description: 'Təmiz state', category: 'Logout', status: 'not-tested', priority: 'medium', bug_id: null }
-        ];
-
-        // ============================================================
         // STATE
         // ============================================================
         let testCases = [];
         let selectedCategory = 'all';
-        let isSyncing = false;
-        let isSupabaseWorking = false;
 
         // ============================================================
-        // LOCAL STORAGE FUNCTIONS
+        // SET STATUS
         // ============================================================
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('navimax_testcases');
-            if (saved) {
-                try {
-                    testCases = JSON.parse(saved);
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        function saveToLocalStorage() {
-            localStorage.setItem('navimax_testcases', JSON.stringify(testCases));
+        function setStatus(type, text) {
+            const el = document.getElementById('connectionStatus');
+            const dot = el.querySelector('.dot');
+            const label = el.querySelector('#statusText');
+            el.className = `status-badge ${type}`;
+            label.textContent = text;
         }
 
         // ============================================================
-        // SUPABASE FUNCTIONS
+        // LOAD FROM SUPABASE
         // ============================================================
-        async function loadFromSupabase() {
-            if (!isSupabaseAvailable) return false;
+        async function loadTestCases() {
+            document.getElementById('tableBody').innerHTML = `
+                    <tr><td colspan="7">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Məlumatlar yüklənir...</p>
+                        </div>
+                    </td></tr>
+                `;
 
             try {
                 const { data, error } = await supabase
@@ -1115,190 +961,113 @@
                     .order('created_at', { ascending: false });
 
                 if (error) {
-                    console.warn('Supabase load error:', error);
-                    return false;
+                    console.error('Supabase xətası:', error);
+                    showToast('Xəta', 'Məlumatlar yüklənərkən xəta: ' + error.message, 'error');
+                    setStatus('offline', '❌ Supabase əlçatmaz');
+                    return;
                 }
 
-                if (data && data.length > 0) {
-                    testCases = data;
-                    isSupabaseWorking = true;
-                    return true;
-                }
-                return false;
-            } catch (e) {
-                console.warn('Supabase connection error:', e);
-                return false;
-            }
-        }
+                testCases = data || [];
+                console.log(`✅ ${testCases.length} test case yükləndi`);
 
-        async function syncToSupabase() {
-            if (!isSupabaseAvailable || isSyncing) return;
-
-            isSyncing = true;
-            updateSyncStatus('syncing', 'Sinxronizasiya...');
-
-            try {
-                // Try to load from Supabase first
-                const supabaseData = await loadFromSupabase();
-
-                if (!supabaseData) {
-                    // If Supabase is empty, upload all local data
-                    for (const tc of testCases) {
-                        try {
-                            await supabase
-                                .from('qa_test_cases')
-                                .upsert({
-                                    tc_id: tc.tc_id,
-                                    title: tc.title,
-                                    description: tc.description || '',
-                                    category: tc.category,
-                                    status: tc.status,
-                                    priority: tc.priority,
-                                    bug_id: tc.bug_id || null
-                                }, { onConflict: 'tc_id' });
-                        } catch (e) {
-                            console.warn('Upload error for', tc.tc_id, e);
-                        }
-                    }
-                    showToast('Uğurlu', 'Bütün məlumatlar Supabase-ə yükləndi', 'success');
-                }
-
-                // Reload from Supabase
-                await loadFromSupabase();
-                saveToLocalStorage();
+                setStatus('online', '✅ Supabase ilə sinxron');
                 renderCategories();
                 render();
-                isSupabaseWorking = true;
-                updateSyncStatus('online', 'Sinxronizasiya edildi');
+                showToast('Uğurlu', `${testCases.length} test case yükləndi`, 'success');
 
-            } catch (e) {
-                console.error('Sync error:', e);
-                showToast('Xəta', 'Sinxronizasiya zamanı xəta', 'error');
-                updateSyncStatus('offline', 'Xəta');
-            } finally {
-                isSyncing = false;
+            } catch (error) {
+                console.error('Yükləmə xətası:', error);
+                showToast('Xəta', 'Məlumatlar yüklənərkən xəta baş verdi', 'error');
+                setStatus('offline', '❌ Supabase əlçatmaz');
             }
         }
 
         // ============================================================
-        // CRUD FUNCTIONS (LocalStorage first, then Supabase)
+        // CRUD OPERATIONS
         // ============================================================
-
-        function generateTCId() {
-            const maxNum = testCases.reduce((max, t) => {
-                const num = parseInt(t.tc_id.replace('TC-', ''));
-                return num > max ? num : max;
-            }, 0);
-            return `TC-${String(maxNum + 1).padStart(3, '0')}`;
-        }
-
         async function addTestCase(data) {
-            const tcId = generateTCId();
+            try {
+                const maxNum = testCases.reduce((max, t) => {
+                    const num = parseInt(t.tc_id.replace('TC-', ''));
+                    return num > max ? num : max;
+                }, 0);
+                const tcId = `TC-${String(maxNum + 1).padStart(3, '0')}`;
 
-            const newTC = {
-                tc_id: tcId,
-                title: data.title,
-                description: data.description || '',
-                category: data.category || 'Digər',
-                status: data.status || 'not-tested',
-                priority: data.priority || 'medium',
-                bug_id: data.bug || null
-            };
+                const { data: inserted, error } = await supabase
+                    .from('qa_test_cases')
+                    .insert([{
+                        tc_id: tcId,
+                        title: data.title,
+                        description: data.description || '',
+                        category: data.category || 'Digər',
+                        status: data.status || 'not-tested',
+                        priority: data.priority || 'medium',
+                        bug_id: data.bug || null
+                    }])
+                    .select()
+                    .single();
 
-            // Add to local
-            testCases.unshift(newTC);
-            saveToLocalStorage();
-            renderCategories();
-            render();
+                if (error) throw error;
 
-            // Try to add to Supabase
-            if (isSupabaseAvailable) {
-                try {
-                    const { error } = await supabase
-                        .from('qa_test_cases')
-                        .insert([newTC]);
+                testCases.unshift(inserted);
+                renderCategories();
+                render();
+                showToast('Uğurlu', `"${data.title}" əlavə edildi`, 'success');
+                return inserted;
 
-                    if (error) {
-                        console.warn('Supabase insert error:', error);
-                        showToast('Xəbərdarlıq', 'Məlumat lokalda saxlandı, sync edin', 'info');
-                    } else {
-                        isSupabaseWorking = true;
-                        showToast('Uğurlu', `"${data.title}" əlavə edildi`, 'success');
-                    }
-                } catch (e) {
-                    console.warn('Supabase insert error:', e);
-                    showToast('Xəbərdarlıq', 'Məlumat lokalda saxlandı, sync edin', 'info');
-                }
-            } else {
-                showToast('Xəbərdarlıq', 'Məlumat lokalda saxlandı', 'info');
+            } catch (error) {
+                console.error('Əlavə etmə xətası:', error);
+                showToast('Xəta', 'Əlavə edərkən xəta baş verdi', 'error');
+                throw error;
             }
-
-            return newTC;
         }
 
         async function updateTestCase(id, updates) {
-            const index = testCases.findIndex(t => t.tc_id === id);
-            if (index === -1) return;
+            try {
+                const { data, error } = await supabase
+                    .from('qa_test_cases')
+                    .update(updates)
+                    .eq('tc_id', id)
+                    .select()
+                    .single();
 
-            // Update local
-            testCases[index] = { ...testCases[index], ...updates };
-            saveToLocalStorage();
-            renderCategories();
-            render();
+                if (error) throw error;
 
-            // Try to update Supabase
-            if (isSupabaseAvailable) {
-                try {
-                    const { error } = await supabase
-                        .from('qa_test_cases')
-                        .update(updates)
-                        .eq('tc_id', id);
-
-                    if (error) {
-                        console.warn('Supabase update error:', error);
-                        showToast('Xəbərdarlıq', 'Lokal yeniləndi, sync edin', 'info');
-                    } else {
-                        showToast('Uğurlu', 'Test case yeniləndi', 'success');
-                    }
-                } catch (e) {
-                    console.warn('Supabase update error:', e);
-                    showToast('Xəbərdarlıq', 'Lokal yeniləndi, sync edin', 'info');
+                const index = testCases.findIndex(t => t.tc_id === id);
+                if (index !== -1) {
+                    testCases[index] = data;
                 }
-            }
+                renderCategories();
+                render();
+                showToast('Uğurlu', 'Test case yeniləndi', 'success');
+                return data;
 
-            return testCases[index];
+            } catch (error) {
+                console.error('Yeniləmə xətası:', error);
+                showToast('Xəta', 'Yeniləyərkən xəta baş verdi', 'error');
+                throw error;
+            }
         }
 
         async function deleteTestCase(id) {
             if (!confirm('Bu test case-i silmək istədiyinizə əminsiniz?')) return;
 
-            // Delete local
-            const deleted = testCases.find(t => t.tc_id === id);
-            testCases = testCases.filter(t => t.tc_id !== id);
-            saveToLocalStorage();
-            renderCategories();
-            render();
+            try {
+                const { error } = await supabase
+                    .from('qa_test_cases')
+                    .delete()
+                    .eq('tc_id', id);
 
-            // Try to delete from Supabase
-            if (isSupabaseAvailable && deleted) {
-                try {
-                    const { error } = await supabase
-                        .from('qa_test_cases')
-                        .delete()
-                        .eq('tc_id', id);
+                if (error) throw error;
 
-                    if (error) {
-                        console.warn('Supabase delete error:', error);
-                        showToast('Xəbərdarlıq', 'Lokal silindi, sync edin', 'info');
-                    } else {
-                        showToast('Uğurlu', 'Test case silindi', 'success');
-                    }
-                } catch (e) {
-                    console.warn('Supabase delete error:', e);
-                    showToast('Xəbərdarlıq', 'Lokal silindi, sync edin', 'info');
-                }
-            } else {
-                showToast('Xəbərdarlıq', 'Lokal silindi', 'info');
+                testCases = testCases.filter(t => t.tc_id !== id);
+                renderCategories();
+                render();
+                showToast('Uğurlu', 'Test case silindi', 'success');
+
+            } catch (error) {
+                console.error('Silinmə xətası:', error);
+                showToast('Xəta', 'Silərkən xəta baş verdi', 'error');
             }
         }
 
@@ -1387,6 +1156,7 @@
             document.getElementById('blocked').textContent = blocked;
             document.getElementById('retest').textContent = retest;
             document.getElementById('notTested').textContent = notTested;
+            document.getElementById('dataCount').textContent = total;
 
             // Update category counts
             document.querySelectorAll('.category-btn').forEach(btn => {
@@ -1398,97 +1168,81 @@
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `
-                    <tr><td colspan="7">
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h3>Heç bir test case tapılmadı</h3>
-                            <p>Yeni test case əlavə etmək üçün "Yeni Test" düyməsinə klikləyin</p>
-                        </div>
-                    </td></tr>
-                `;
+                        <tr><td colspan="7">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <h3>Heç bir test case tapılmadı</h3>
+                                <p>Yeni test case əlavə etmək üçün "Yeni Test" düyməsinə klikləyin</p>
+                            </div>
+                        </td></tr>
+                    `;
                 return;
             }
 
             tbody.innerHTML = filtered.map(tc => {
                 const cat = categories.find(c => c.id === tc.category);
                 const icon = cat ? cat.icon : '📌';
+                const statusLabels = {
+                    'not-tested': '⏳ Edilməyib',
+                    'passed': '✅ Keçdi',
+                    'failed': '❌ Uğursuz',
+                    'blocked': '🚫 Bloklanıb',
+                    'retest': '🔄 Retest'
+                };
+                const priorityLabels = {
+                    'critical': '🔴 Critical',
+                    'high': '🟠 High',
+                    'medium': '🔵 Medium',
+                    'low': '⚪ Low'
+                };
                 return `
-                    <tr>
-                        <td>
-                            <label class="checkbox-custom">
-                                <input type="checkbox" ${tc.status === 'passed' ? 'checked' : ''} 
-                                       onchange="toggleStatus('${tc.tc_id}')" />
-                                <span class="checkmark"><i class="fas fa-check"></i></span>
-                            </label>
-                        </td>
-                        <td><span class="tc-id">${tc.tc_id}</span></td>
-                        <td>
-                            <div class="tc-title">
-                                ${tc.title}
-                                <small>${tc.description || 'Təsvir yoxdur'}</small>
-                                <span class="tc-category">${icon} ${tc.category}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <select class="td-select" onchange="updateStatus('${tc.tc_id}', this.value)">
-                                <option value="not-tested" ${tc.status === 'not-tested' ? 'selected' : ''}>⏳ Edilməyib</option>
-                                <option value="passed" ${tc.status === 'passed' ? 'selected' : ''}>✅ Keçdi</option>
-                                <option value="failed" ${tc.status === 'failed' ? 'selected' : ''}>❌ Uğursuz</option>
-                                <option value="blocked" ${tc.status === 'blocked' ? 'selected' : ''}>🚫 Bloklanıb</option>
-                                <option value="retest" ${tc.status === 'retest' ? 'selected' : ''}>🔄 Retest</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="td-select td-select-priority ${tc.priority}" 
-                                    onchange="updatePriority('${tc.tc_id}', this.value)">
-                                <option value="critical" ${tc.priority === 'critical' ? 'selected' : ''}>🔴 Critical</option>
-                                <option value="high" ${tc.priority === 'high' ? 'selected' : ''}>🟠 High</option>
-                                <option value="medium" ${tc.priority === 'medium' ? 'selected' : ''}>🔵 Medium</option>
-                                <option value="low" ${tc.priority === 'low' ? 'selected' : ''}>⚪ Low</option>
-                            </select>
-                        </td>
-                        <td>
-                            <input class="bug-input" type="text" placeholder="BUG-ID" 
-                                   value="${tc.bug_id || ''}" 
-                                   onchange="updateBug('${tc.tc_id}', this.value)" />
-                        </td>
-                        <td>
-                            <button class="btn-delete" onclick="deleteTestCase('${tc.tc_id}')" title="Sil">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                        <tr>
+                            <td>
+                                <label class="checkbox-custom">
+                                    <input type="checkbox" ${tc.status === 'passed' ? 'checked' : ''} 
+                                           onchange="toggleStatus('${tc.tc_id}')" />
+                                    <span class="checkmark"><i class="fas fa-check"></i></span>
+                                </label>
+                            </td>
+                            <td><span class="tc-id">${tc.tc_id}</span></td>
+                            <td>
+                                <div class="tc-title">
+                                    ${tc.title}
+                                    <small>${tc.description || 'Təsvir yoxdur'}</small>
+                                    <span class="tc-category">${icon} ${tc.category}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <select class="td-select" onchange="updateStatus('${tc.tc_id}', this.value)">
+                                    <option value="not-tested" ${tc.status === 'not-tested' ? 'selected' : ''}>⏳ Edilməyib</option>
+                                    <option value="passed" ${tc.status === 'passed' ? 'selected' : ''}>✅ Keçdi</option>
+                                    <option value="failed" ${tc.status === 'failed' ? 'selected' : ''}>❌ Uğursuz</option>
+                                    <option value="blocked" ${tc.status === 'blocked' ? 'selected' : ''}>🚫 Bloklanıb</option>
+                                    <option value="retest" ${tc.status === 'retest' ? 'selected' : ''}>🔄 Retest</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="td-select td-select-priority ${tc.priority}" 
+                                        onchange="updatePriority('${tc.tc_id}', this.value)">
+                                    <option value="critical" ${tc.priority === 'critical' ? 'selected' : ''}>🔴 Critical</option>
+                                    <option value="high" ${tc.priority === 'high' ? 'selected' : ''}>🟠 High</option>
+                                    <option value="medium" ${tc.priority === 'medium' ? 'selected' : ''}>🔵 Medium</option>
+                                    <option value="low" ${tc.priority === 'low' ? 'selected' : ''}>⚪ Low</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input class="bug-input" type="text" placeholder="BUG-ID" 
+                                       value="${tc.bug_id || ''}" 
+                                       onchange="updateBug('${tc.tc_id}', this.value)" />
+                            </td>
+                            <td>
+                                <button class="btn-delete" onclick="deleteTestCase('${tc.tc_id}')" title="Sil">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
             }).join('');
-        }
-
-        // ============================================================
-        // SYNC STATUS
-        // ============================================================
-        function updateSyncStatus(status, label) {
-            const dot = document.getElementById('syncDot');
-            const labelEl = document.getElementById('syncLabel');
-            const textEl = document.getElementById('statusText');
-
-            dot.className = `dot ${status}`;
-
-            switch (status) {
-                case 'online':
-                    labelEl.textContent = label || 'Online';
-                    textEl.textContent = '✅ Supabase ilə sinxron';
-                    break;
-                case 'offline':
-                    labelEl.textContent = label || 'Offline';
-                    textEl.textContent = '⚠️ Lokal rejim';
-                    break;
-                case 'syncing':
-                    labelEl.textContent = label || 'Sinxronizasiya...';
-                    textEl.textContent = '🔄 Sinxronizasiya davam edir...';
-                    break;
-                default:
-                    labelEl.textContent = label || 'Yüklənir...';
-                    textEl.textContent = '⏳ Yüklənir...';
-            }
         }
 
         // ============================================================
@@ -1505,16 +1259,16 @@
 
             toast.className = `toast ${type}`;
             toast.innerHTML = `
-                <i class="fas ${icons[type] || icons.info}"></i>
-                <div>
-                    <div style="font-weight:600;font-size:14px;">${title}</div>
-                    <div style="font-size:13px;color:#6a6a82;">${message}</div>
-                </div>
-                <button style="background:transparent;border:none;color:#6a6a82;cursor:pointer;font-size:16px;" 
-                        onclick="this.parentElement.remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
+                    <i class="fas ${icons[type] || icons.info}"></i>
+                    <div>
+                        <div style="font-weight:600;font-size:14px;color:#1a1a2e;">${title}</div>
+                        <div style="font-size:13px;color:#64748b;">${message}</div>
+                    </div>
+                    <button style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:16px;" 
+                            onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
 
             container.appendChild(toast);
             setTimeout(() => {
@@ -1584,18 +1338,15 @@
                 }
                 closeModal();
             } catch (error) {
-                showToast('Xəta', 'Əməliyyat zamanı xəta', 'error');
+                // Error already handled
             }
         });
 
         // ============================================================
-        // SEARCH, SYNC, REFRESH
+        // SEARCH & REFRESH
         // ============================================================
         document.getElementById('searchInput').addEventListener('input', render);
-
-        document.getElementById('syncBtn').addEventListener('click', async () => {
-            await syncToSupabase();
-        });
+        document.getElementById('refreshBtn').addEventListener('click', loadTestCases);
 
         // ============================================================
         // KEYBOARD SHORTCUTS
@@ -1606,62 +1357,15 @@
                 openModal(); }
             if (e.ctrlKey && e.key === 'f') { e.preventDefault();
                 document.getElementById('searchInput').focus(); }
-            if (e.ctrlKey && e.key === 's') { e.preventDefault();
-                syncToSupabase(); }
         });
 
         // ============================================================
-        // INIT
+        // START
         // ============================================================
-        async function init() {
-            updateSyncStatus('', 'Yüklənir...');
+        loadTestCases();
 
-            // Try to load from LocalStorage first
-            const hasLocal = loadFromLocalStorage();
-
-            if (hasLocal && testCases.length > 0) {
-                renderCategories();
-                render();
-                showToast('Info', `${testCases.length} test case lokalda yükləndi`, 'info');
-                updateSyncStatus('offline', 'Lokal rejim');
-            } else {
-                // No local data, use defaults
-                testCases = JSON.parse(JSON.stringify(defaultTestCases));
-                saveToLocalStorage();
-                renderCategories();
-                render();
-                showToast('Info', 'Default test case-lər yükləndi', 'info');
-                updateSyncStatus('offline', 'Default məlumatlar');
-            }
-
-            // Try to load from Supabase in background
-            if (isSupabaseAvailable) {
-                try {
-                    const supabaseLoaded = await loadFromSupabase();
-                    if (supabaseLoaded) {
-                        renderCategories();
-                        render();
-                        showToast('Uğurlu', 'Supabase məlumatları yükləndi', 'success');
-                        updateSyncStatus('online', 'Supabase ilə sinxron');
-                    } else {
-                        // If Supabase is empty, upload local data
-                        await syncToSupabase();
-                    }
-                } catch (e) {
-                    console.warn('Background sync error:', e);
-                    updateSyncStatus('offline', 'Supabase əlçatmaz');
-                }
-            } else {
-                updateSyncStatus('offline', 'Supabase əlçatmaz');
-            }
-
-            console.log('✅ NaviMax QA Checklist yükləndi!');
-            console.log(`📊 ${testCases.length} test case var`);
-            console.log('⌨️ Qısayollar: Ctrl+N (Yeni), Ctrl+F (Axtar), Ctrl+S (Sync), ESC (Bağla)');
-        }
-
-        // Start
-        init();
+        console.log('✅ NaviMax QA Checklist - Ağ fon yükləndi!');
+        console.log('⌨️ Qısayollar: Ctrl+N (Yeni), Ctrl+F (Axtar), ESC (Bağla)');
     </script>
 
 </body>
