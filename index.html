@@ -1016,8 +1016,7 @@ Swal.fire({
             }
         }
 
-        async function updateTestCase(id, updates) {
-            Swal.fire({
+async function updateTestCase(id, updates, showMessage = true) {            Swal.fire({
     title: "Yadda saxlanılır...",
     text: "Gözləyin",
     allowOutsideClick: false,
@@ -1113,16 +1112,17 @@ Swal.fire({
         }
 
         async function updateStatus(id, value) {
-            await updateTestCase(id, { status: value });
+    await updateTestCase(id, { status: value }, false);
         }
 
         async function updatePriority(id, value) {
-            await updateTestCase(id, { priority: value });
+    await updateTestCase(id, { priority: value }, false);
         }
 
         async function updateBug(id, value) {
-            await updateTestCase(id, { bug_id: value || null });
-        }
+async function updateBug(id, value) {
+    await updateTestCase(id, { bug_id: value || null }, false);
+}        }
 
         // ============================================================
         // RENDER FUNCTIONS
