@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NaviMax QA Checklist - Supabase</title>
+    <title>NaviMax QA Checklist</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         * {
@@ -30,7 +28,6 @@
             margin: 0 auto;
         }
 
-        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -55,6 +52,12 @@
         .header .subtitle {
             color: #6a6a82;
             font-size: 13px;
+        }
+        .header .subtitle .online {
+            color: #10b981;
+        }
+        .header .subtitle .offline {
+            color: #ef4444;
         }
 
         .header-actions {
@@ -117,8 +120,15 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(79, 140, 247, 0.3);
         }
+        .btn-success {
+            background: #10b981;
+            border: none;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
 
-        /* Stats */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -157,7 +167,6 @@
             color: #4f8cf7;
         }
 
-        /* Category Filter */
         .category-filter {
             display: flex;
             gap: 8px;
@@ -209,7 +218,6 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        /* Table */
         .table-wrap {
             background: #12121a;
             border: 1px solid #2a2a3e;
@@ -249,7 +257,6 @@
             vertical-align: middle;
         }
 
-        /* Custom Checkbox */
         .checkbox-custom {
             display: flex;
             align-items: center;
@@ -310,52 +317,7 @@
             border-radius: 12px;
             display: inline-block;
             border: 1px solid #2a2a3e;
-        }
-
-        /* Badges */
-        .badge {
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .badge.passed {
-            background: rgba(16, 185, 129, 0.15);
-            color: #10b981;
-        }
-        .badge.failed {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-        }
-        .badge.blocked {
-            background: rgba(245, 158, 11, 0.15);
-            color: #f59e0b;
-        }
-        .badge.retest {
-            background: rgba(124, 58, 237, 0.15);
-            color: #7c3aed;
-        }
-        .badge.not-tested {
-            background: rgba(106, 106, 130, 0.15);
-            color: #6a6a82;
-        }
-
-        .badge.critical {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-        .badge.high {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
-        }
-        .badge.medium {
-            background: rgba(79, 140, 247, 0.2);
-            color: #4f8cf7;
-        }
-        .badge.low {
-            background: rgba(106, 106, 130, 0.2);
-            color: #6a6a82;
+            margin-top: 4px;
         }
 
         .td-select {
@@ -455,7 +417,6 @@
             }
         }
 
-        /* Toast */
         .toast-container {
             position: fixed;
             bottom: 24px;
@@ -506,7 +467,6 @@
             }
         }
 
-        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -640,6 +600,39 @@
             box-shadow: 0 8px 24px rgba(79, 140, 247, 0.3);
         }
 
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #6a6a82;
+        }
+        .sync-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .sync-status .dot.online {
+            background: #10b981;
+        }
+        .sync-status .dot.offline {
+            background: #ef4444;
+        }
+        .sync-status .dot.syncing {
+            background: #f59e0b;
+            animation: pulse 0.8s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 12px;
@@ -704,7 +697,13 @@
         <div class="header">
             <div>
                 <h1><i class="fas fa-clipboard-check"></i> NaviMax QA Checklist</h1>
-                <div class="subtitle">Supabase ilə canlı test case idarəsi</div>
+                <div class="subtitle">
+                    <span id="statusText">Yüklənir...</span>
+                    <span class="sync-status" id="syncStatus">
+                        <span class="dot" id="syncDot"></span>
+                        <span id="syncLabel">Yüklənir...</span>
+                    </span>
+                </div>
             </div>
             <div class="header-actions">
                 <div class="search-box">
@@ -714,8 +713,8 @@
                 <button class="btn btn-primary" id="addBtn">
                     <i class="fas fa-plus"></i> Yeni Test
                 </button>
-                <button class="btn" id="refreshBtn">
-                    <i class="fas fa-sync-alt"></i>
+                <button class="btn btn-success" id="syncBtn">
+                    <i class="fas fa-cloud-upload-alt"></i> Sync
                 </button>
             </div>
         </div>
@@ -734,7 +733,6 @@
         <div class="category-filter" id="categoryFilter">
             <span class="filter-label"><i class="fas fa-tags"></i> Kateqoriya:</span>
             <button class="category-btn active" data-category="all">Hamısı <span class="count" id="countAll">0</span></button>
-            <!-- Dynamic categories -->
         </div>
 
         <!-- Table -->
@@ -841,14 +839,16 @@
         const SUPABASE_URL = 'https://vqdzohcztqztnsqbptfm.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_vHOZFaQlWoJ1epmGcfB9lw_Zn2v27v2';
 
-        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabase = null;
+        let isSupabaseAvailable = false;
 
-        // ============================================================
-        // STATE
-        // ============================================================
-        let testCases = [];
-        let isLoading = false;
-        let selectedCategory = 'all';
+        try {
+            supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            isSupabaseAvailable = true;
+        } catch (e) {
+            console.warn('Supabase client yaradılmadı:', e);
+            isSupabaseAvailable = false;
+        }
 
         // ============================================================
         // CATEGORIES (SABİT)
@@ -867,20 +867,246 @@
         ];
 
         // ============================================================
-        // CRUD FUNCTIONS
+        // DEFAULT TEST CASES
         // ============================================================
+        const defaultTestCases = [
+            { tc_id: 'TC-001', title: 'Düzgün telefon nömrəsi ilə giriş', description: 'İstifadəçi düzgün nömrə ilə daxil olur',
+                category: 'Login / Register', status: 'not-tested', priority: 'critical', bug_id: null },
+            { tc_id: 'TC-002', title: 'İnternet olmadan giriş', description: 'İnternet bağlantısı olmadan giriş cəhdi',
+                category: 'Login / Register', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-003', title: 'Düzgün OTP ilə giriş', description: 'İstifadəçi düzgün OTP kodunu daxil edir',
+                category: 'Login / Register', status: 'not-tested', priority: 'critical', bug_id: null },
+            { tc_id: 'TC-004', title: 'Yanlış OTP daxil edilməsi', description: 'Səhv OTP kodu daxil edilir',
+                category: 'Login / Register', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-005', title: 'Boş telefon nömrəsi', description: 'Telefon nömrəsi boş göndərilir',
+                category: 'Login / Register', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-006', title: 'Boş OTP', description: 'OTP sahəsi boş göndərilir', category: 'Login / Register',
+                status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-007', title: 'Sessiyanın yaradılması', description: 'Uğurlu girişdən sonra sessiya yaranır',
+                category: 'Login / Register', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-008', title: 'Logout sonrası yenidən giriş', description: 'Çıxış edib yenidən daxil olma',
+                category: 'Login / Register', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-009', title: 'Obyekti silib yenidən daxil olma', description: 'Obyekt silindikdən sonra yenidən giriş',
+                category: 'Login / Register', status: 'not-tested', priority: 'low', bug_id: null },
+            { tc_id: 'TC-010', title: 'Loading ekranı', description: 'Ana səhifə yüklənərkən loading göstərilir',
+                category: 'Ana səhifə', status: 'not-tested', priority: 'low', bug_id: null },
+            { tc_id: 'TC-011', title: 'Ana səhifənin açılması', description: 'Dashboard məlumatları yüklənir',
+                category: 'Ana səhifə', status: 'not-tested', priority: 'critical', bug_id: null },
+            { tc_id: 'TC-012', title: 'Dashboard məlumatlarının yüklənməsi', description: 'Bütün dashboard widget-ları yüklənir',
+                category: 'Ana səhifə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-013', title: 'İnternet olmadan açılması', description: 'Offline rejimdə ana səhifə',
+                category: 'Ana səhifə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-014', title: 'İnternet aktiv olduğu halda yanlış Internet Error göstərməməsi',
+                description: 'Internet olduğu halda error göstərilmir', category: 'Ana səhifə', status: 'not-tested',
+                priority: 'high', bug_id: null },
+            { tc_id: 'TC-015', title: 'Wi-Fi-dan Mobil Dataya keçid zamanı stabil yenilənmə',
+                description: 'Şəbəkə dəyişikliyində məlumatlar yenilənir', category: 'Ana səhifə', status: 'not-tested',
+                priority: 'medium', bug_id: null },
+            { tc_id: 'TC-016', title: 'Server gec cavab verdikdə Loading və Error state',
+                description: 'Gecikmədə düzgün state idarəsi', category: 'Ana səhifə', status: 'not-tested', priority: 'medium',
+                bug_id: null },
+            { tc_id: 'TC-017', title: 'Obyektlər hissəsində yalnız seçilən obyektlərin görünməsi',
+                description: 'Filtr işləyir', category: 'Ana səhifə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-018', title: 'Mənim obyektimin həmişə seçili olması', description: 'Default seçilmiş obyekt',
+                category: 'Ana səhifə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-019', title: 'Seçilməyən obyektə obyektlər hissəsində daxil olanda görünməsi',
+                description: 'Başqa obyekt seçimi', category: 'Ana səhifə', status: 'not-tested', priority: 'low',
+                bug_id: null },
+            { tc_id: 'TC-020', title: 'Xəritənin açılması', description: 'Google Maps düzgün yüklənir', category: 'Xəritə',
+                status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-021', title: 'Cari mövqenin göstərilməsi', description: 'İstifadəçinin cari mövqeyi göstərilir',
+                category: 'Xəritə', status: 'not-tested', priority: 'critical', bug_id: null },
+            { tc_id: 'TC-022', title: 'Zoom In', description: 'Zoom In funksiyası işləyir', category: 'Xərită',
+                status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-023', title: 'Zoom Out', description: 'Zoom Out funksiyası işləyir', category: 'Xəritə',
+                status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-024', title: 'Peyk görünüşü', description: 'Satellite view keçidi', category: 'Xəritə',
+                status: 'not-tested', priority: 'low', bug_id: null },
+            { tc_id: 'TC-025', title: 'Markerlərin görünməsi', description: 'Bütün markerlər göstərilir', category: 'Xəritə',
+                status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-026', title: 'İnternet bərpa olunduqdan sonra markerlərin yenilənməsi',
+                description: 'Online olduqda markerlər yenilənir', category: 'Xəritə', status: 'not-tested', priority: 'high',
+                bug_id: null },
+            { tc_id: 'TC-027', title: 'Refresh sonrası seçilmiş obyektin koordinatının qorunması',
+                description: 'Refresh-də obyekt qorunur', category: 'Xəritə', status: 'not-tested', priority: 'medium',
+                bug_id: null },
+            { tc_id: 'TC-028', title: 'Cluster + Zoom + Marker seçiminin birlikdə işləməsi',
+                description: 'Kompleks interaksiya', category: 'Xəritə', status: 'not-tested', priority: 'high',
+                bug_id: null },
+            { tc_id: 'TC-029', title: 'Eyni koordinatda bir neçə obyekt olduqda "Mənim obyekti göstər"',
+                description: 'Cluster-də obyekt seçimi', category: 'Xəritə', status: 'not-tested', priority: 'medium',
+                bug_id: null },
+            { tc_id: 'TC-030', title: '"Mənim obyekti göstər" seçildikdə cluster markerinin titrəməməsi',
+                description: 'Flicker problemi yoxdur', category: 'Xəritə', status: 'not-tested', priority: 'medium',
+                bug_id: null },
+            { tc_id: 'TC-031', title: 'Başqa obyekt seçildikdən sonra "Mənim obyekti göstər" funksiyası',
+                description: 'Obyekt fokuslanır', category: 'Xəritə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-032', title: '"Mənim obyekti göstər" seçildikdə obyektin xəritədə görünməsi',
+                description: 'Obyekt xəritədə göstərilir', category: 'Xəritə', status: 'not-tested', priority: 'high',
+                bug_id: null },
+            { tc_id: 'TC-033', title: 'Obyekt profil şəklinin marker üzərində göstərilməsi',
+                description: 'Avatar marker-də göstərilir', category: 'Xəritə', status: 'not-tested', priority: 'low',
+                bug_id: null },
+            { tc_id: 'TC-034', title: 'Obyektlər siyahısından seçilən obyekt cluster daxilindədirsə avtomatik zoom',
+                description: 'Cluster-dən seçim', category: 'Xəritə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-035', title: 'Cluster daxilində seçilmiş obyektin fokuslanması', description: 'Cluster-dən fokus',
+                category: 'Xəritə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-036', title: 'Yeni yaradılan obyektin xəritədə gecikmədən görünməsi',
+                description: 'Real-time obyekt əlavəsi', category: 'Xəritə', status: 'not-tested', priority: 'high',
+                bug_id: null },
+            { tc_id: 'TC-037', title: 'Obyekt siyahısı', description: 'Bütün obyektlər siyahıda göstərilir',
+                category: 'Obyektlər', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-038', title: 'Obyekt axtarışı', description: 'Obyektlər arasında axtarış işləyir',
+                category: 'Obyektlər', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-039', title: 'Obyekt filtri', description: 'Filter funksiyası işləyir', category: 'Obyektlər',
+                status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-040', title: 'Obyekt seçilməsi', description: 'Obyekt seçimi işləyir', category: 'Obyektlər',
+                status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-041', title: 'Obyekt statusu', description: 'Obyekt statusu göstərilir', category: 'Obyektlər',
+                status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-042', title: 'Obyekt seçilib background-a göndərildikdən sonra fokusun qorunması',
+                description: 'Background-dan qayıdanda fokus qorunur', category: 'Obyektlər', status: 'not-tested',
+                priority: 'low', bug_id: null },
+            { tc_id: 'TC-043', title: 'Tətbiq kill edilib yenidən açıldıqda son seçilmiş obyektin bərpa olunması',
+                description: 'Kill-dən sonra bərpa', category: 'Obyektlər', status: 'not-tested', priority: 'medium',
+                bug_id: null },
+            { tc_id: 'TC-044', title: 'Yeni yaradılan obyektin siyahıda gecikmədən görünməsi',
+                description: 'Real-time əlavə', category: 'Obyektlər', status: 'not-tested', priority: 'high',
+                bug_id: null },
+            { tc_id: 'TC-045', title: 'Bir-birinə yaxın obyektlər seçildikdə düzgün cluster davranışı',
+                description: 'Cluster davranışı', category: 'Obyektlər', status: 'not-tested', priority: 'medium',
+                bug_id: null },
+            { tc_id: 'TC-046', title: 'İlk login zamanı yaradılan obyektlə sonradan yaradılan obyektin eyni qaydada görünməsi',
+                description: 'Obyekt ardıcıllığı', category: 'Obyektlər', status: 'not-tested', priority: 'low',
+                bug_id: null },
+            { tc_id: 'TC-047', title: 'Obyekt silindikdən sonra cache-də köhnə məlumatın qalmaması',
+                description: 'Cache təmizlənməsi', category: 'Obyektlər', status: 'not-tested', priority: 'high',
+                bug_id: null },
+            { tc_id: 'TC-048', title: 'Eyni adda obyekt silinib yenidən yaradıldıqda düzgün davranış',
+                description: 'Yenidən yaratma', category: 'Obyektlər', status: 'not-tested', priority: 'medium',
+                bug_id: null },
+            { tc_id: 'TC-049', title: 'Tarixçə səhifəsinin açılması', description: 'Tarixçə səhifəsi açılır',
+                category: 'Tarixçə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-050', title: 'Auto Refresh', description: 'Tarixçə avtomatik yenilənir', category: 'Tarixçə',
+                status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-051', title: 'Hərəkət tarixçəsi', description: 'Hərəkət məlumatları göstərilir',
+                category: 'Tarixçə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-052', title: 'Dayanma tarixçəsi', description: 'Dayanma məlumatları göstərilir',
+                category: 'Tarixçə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-053', title: 'GPS Error tarixçəsi', description: 'GPS xətaları göstərilir', category: 'Tarixçə',
+                status: 'not-tested', priority: 'low', bug_id: null },
+            { tc_id: 'TC-054', title: 'İnternet olmadıqda Connection Error-un düzgün göstərilməsi',
+                description: 'Offline xətası', category: 'Tarixçə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-055', title: 'İnternet bərpa olunduqda köhnə Error mesajının silinməsi',
+                description: 'Error təmizlənməsi', category: 'Tarixçə', status: 'not-tested', priority: 'medium',
+                bug_id: null },
+            { tc_id: 'TC-056', title: 'İnternet bərpa olunduqda məlumatların avtomatik yenilənməsi',
+                description: 'Auto refresh online', category: 'Tarixçə', status: 'not-tested', priority: 'high',
+                bug_id: null },
+            { tc_id: 'TC-057', title: 'Uzun məsafəli hərəkət tarixçəsinin düzgün açılması', description: 'Uzun marşrut',
+                category: 'Tarixçə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-058', title: 'Uzun marşrut xəritəsində scroll/pan zamanı donma və kəsilmələrin olmaması',
+                description: 'Performans', category: 'Tarixçə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-059', title: 'Canlı sürət', description: 'Real vaxtda sürət göstərilir', category: 'Maşın İzləmə',
+                status: 'not-tested', priority: 'critical', bug_id: null },
+            { tc_id: 'TC-060', title: 'Engine ON/OFF', description: 'Mühərrik vəziyyəti göstərilir',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-061', title: 'Yanacaq səviyyəsi', description: 'Yanacaq səviyyəsi göstərilir',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-062', title: 'Hard Brake', description: 'Hard brake hadisələri qeydə alınır',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'critical', bug_id: null },
+            { tc_id: 'TC-063', title: 'Hard Turn', description: 'Hard turn hadisələri qeydə alınır',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'critical', bug_id: null },
+            { tc_id: 'TC-064', title: 'Parking', description: 'Parking vəziyyəti göstərilir', category: 'Maşın İzləmə',
+                status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-065', title: 'Obyektin real vaxtda xəritədə hərəkəti', description: 'Real-time tracking',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'critical', bug_id: null },
+            { tc_id: 'TC-066', title: 'Sürətin düzgün göstərilməsi', description: 'Sürət dəqiqliyi',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-067', title: 'Refresh olmadan koordinatların yenilənməsi', description: 'Real-time yenilənmə',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-068', title: 'Başqa cihazdan refresh edilmədən sinxronizasiya', description: 'Multi-device sync',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-069', title: 'Android və iOS koordinatlarının eyni olması', description: 'Platforma uyğunluğu',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-070', title: 'Offline → Online keçiddə statusun yenilənməsi', description: 'Status dəyişikliyi',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-071', title: 'Zəif internetdə köhnə koordinatda donmaması', description: 'Zəif şəbəkə davranışı',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-072', title: 'Telefon obyektlərində sürət məlumatının göstərilməsi', description: 'Telefon tracking',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-073', title: 'Telefon və maşın obyektlərində eyni davranış', description: 'Obyekt tipləri',
+                category: 'Maşın İzləmə', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-074', title: 'Online olsa belə obyektin köhnə koordinatda qalmaması',
+                description: 'Koordinat yenilənməsi', category: 'Maşın İzləmə', status: 'not-tested', priority: 'critical',
+                bug_id: null },
+            { tc_id: 'TC-075', title: 'Online obyektin sürət məlumatının real vaxtda yenilənməsi',
+                description: 'Sürət real-time', category: 'Maşın İzləmə', status: 'not-tested', priority: 'high',
+                bug_id: null },
+            { tc_id: 'TC-076', title: 'Bildirişlər səhifəsinin açılması', description: 'Bildirişlər siyahısı açılır',
+                category: 'Bildirişlər', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-077', title: 'Obyekt əlavə etmə hissəsində profil şəklinin UI elementlərinin üstünə düşməməsi',
+                description: 'UI z-index problemi', category: 'Bildirişlər', status: 'not-tested', priority: 'low',
+                bug_id: null },
+            { tc_id: 'TC-078', title: 'Müxtəlif ekran ölçülərində UI elementlərinin düzgün yerləşməsi',
+                description: 'Responsive dizayn', category: 'Bildirişlər', status: 'not-tested', priority: 'medium',
+                bug_id: null },
+            { tc_id: 'TC-079', title: 'Kart əlavə etmə ekranının açılması', description: 'Kart əlavə etmə ekranı açılır',
+                category: 'Kart', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-080', title: 'Kart əlavə edilərkən ekranın avtomatik aşağı scroll etməməsi',
+                description: 'Scroll problemi', category: 'Kart', status: 'not-tested', priority: 'low', bug_id: null },
+            { tc_id: 'TC-081', title: 'Keyboard açıldıqda input fokusunun pozulmaması', description: 'Keyboard focus',
+                category: 'Kart', status: 'not-tested', priority: 'medium', bug_id: null },
+            { tc_id: 'TC-082', title: 'Balans artırılarkən maksimum limitin tətbiqi', description: 'Limit tətbiqi',
+                category: 'Balans', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-083', title: 'Limit aşılarkən düzgün xəbərdarlıq göstərilməsi', description: 'Limit xəbərdarlığı',
+                category: 'Balans', status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-084', title: 'Hesabdan çıxış', description: 'Logout funksiyası işləyir', category: 'Logout',
+                status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-085', title: 'Sessiyanın silinməsi', description: 'Session təmizlənir', category: 'Logout',
+                status: 'not-tested', priority: 'critical', bug_id: null },
+            { tc_id: 'TC-086', title: 'Yenidən giriş', description: 'Logout-dan sonra yenidən giriş', category: 'Logout',
+                status: 'not-tested', priority: 'high', bug_id: null },
+            { tc_id: 'TC-087', title: 'Logout sonrası cache və seçilmiş obyektlərin silinməsi',
+                description: 'Cache təmizlənməsi', category: 'Logout', status: 'not-tested', priority: 'high',
+                bug_id: null },
+            { tc_id: 'TC-088', title: 'Logout sonrası xəritə və obyekt siyahısının təmiz vəziyyətdə açılması',
+                description: 'Təmiz state', category: 'Logout', status: 'not-tested', priority: 'medium', bug_id: null }
+        ];
 
-        async function loadTestCases() {
-            if (isLoading) return;
-            isLoading = true;
-            document.getElementById('tableBody').innerHTML = `
-                <tr><td colspan="7">
-                    <div class="loading">
-                        <i class="fas fa-spinner"></i>
-                        <p>Məlumatlar yüklənir...</p>
-                    </div>
-                </td></tr>
-            `;
+        // ============================================================
+        // STATE
+        // ============================================================
+        let testCases = [];
+        let selectedCategory = 'all';
+        let isSyncing = false;
+        let isSupabaseWorking = false;
+
+        // ============================================================
+        // LOCAL STORAGE FUNCTIONS
+        // ============================================================
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('navimax_testcases');
+            if (saved) {
+                try {
+                    testCases = JSON.parse(saved);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('navimax_testcases', JSON.stringify(testCases));
+        }
+
+        // ============================================================
+        // SUPABASE FUNCTIONS
+        // ============================================================
+        async function loadFromSupabase() {
+            if (!isSupabaseAvailable) return false;
 
             try {
                 const { data, error } = await supabase
@@ -888,114 +1114,199 @@
                     .select('*')
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                if (error) {
+                    console.warn('Supabase load error:', error);
+                    return false;
+                }
 
-                testCases = data || [];
+                if (data && data.length > 0) {
+                    testCases = data;
+                    isSupabaseWorking = true;
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                console.warn('Supabase connection error:', e);
+                return false;
+            }
+        }
+
+        async function syncToSupabase() {
+            if (!isSupabaseAvailable || isSyncing) return;
+
+            isSyncing = true;
+            updateSyncStatus('syncing', 'Sinxronizasiya...');
+
+            try {
+                // Try to load from Supabase first
+                const supabaseData = await loadFromSupabase();
+
+                if (!supabaseData) {
+                    // If Supabase is empty, upload all local data
+                    for (const tc of testCases) {
+                        try {
+                            await supabase
+                                .from('qa_test_cases')
+                                .upsert({
+                                    tc_id: tc.tc_id,
+                                    title: tc.title,
+                                    description: tc.description || '',
+                                    category: tc.category,
+                                    status: tc.status,
+                                    priority: tc.priority,
+                                    bug_id: tc.bug_id || null
+                                }, { onConflict: 'tc_id' });
+                        } catch (e) {
+                            console.warn('Upload error for', tc.tc_id, e);
+                        }
+                    }
+                    showToast('Uğurlu', 'Bütün məlumatlar Supabase-ə yükləndi', 'success');
+                }
+
+                // Reload from Supabase
+                await loadFromSupabase();
+                saveToLocalStorage();
                 renderCategories();
                 render();
-                showToast('Uğurlu', `${testCases.length} test case yükləndi`, 'success');
-            } catch (error) {
-                console.error('Load error:', error);
-                showToast('Xəta', 'Məlumatlar yüklənərkən xəta baş verdi', 'error');
-                document.getElementById('tableBody').innerHTML = `
-                    <tr><td colspan="7">
-                        <div class="empty-state">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <h3>Xəta baş verdi</h3>
-                            <p>${error.message}</p>
-                        </div>
-                    </td></tr>
-                `;
+                isSupabaseWorking = true;
+                updateSyncStatus('online', 'Sinxronizasiya edildi');
+
+            } catch (e) {
+                console.error('Sync error:', e);
+                showToast('Xəta', 'Sinxronizasiya zamanı xəta', 'error');
+                updateSyncStatus('offline', 'Xəta');
             } finally {
-                isLoading = false;
+                isSyncing = false;
             }
+        }
+
+        // ============================================================
+        // CRUD FUNCTIONS (LocalStorage first, then Supabase)
+        // ============================================================
+
+        function generateTCId() {
+            const maxNum = testCases.reduce((max, t) => {
+                const num = parseInt(t.tc_id.replace('TC-', ''));
+                return num > max ? num : max;
+            }, 0);
+            return `TC-${String(maxNum + 1).padStart(3, '0')}`;
         }
 
         async function addTestCase(data) {
-            try {
-                const maxNum = testCases.reduce((max, t) => {
-                    const num = parseInt(t.tc_id.replace('TC-', ''));
-                    return num > max ? num : max;
-                }, 0);
-                const tcId = `TC-${String(maxNum + 1).padStart(3, '0')}`;
+            const tcId = generateTCId();
 
-                const { data: inserted, error } = await supabase
-                    .from('qa_test_cases')
-                    .insert([{
-                        tc_id: tcId,
-                        title: data.title,
-                        description: data.description || '',
-                        category: data.category || 'Digər',
-                        status: data.status || 'not-tested',
-                        priority: data.priority || 'medium',
-                        bug_id: data.bug || null
-                    }])
-                    .select()
-                    .single();
+            const newTC = {
+                tc_id: tcId,
+                title: data.title,
+                description: data.description || '',
+                category: data.category || 'Digər',
+                status: data.status || 'not-tested',
+                priority: data.priority || 'medium',
+                bug_id: data.bug || null
+            };
 
-                if (error) throw error;
+            // Add to local
+            testCases.unshift(newTC);
+            saveToLocalStorage();
+            renderCategories();
+            render();
 
-                testCases.unshift(inserted);
-                renderCategories();
-                render();
-                showToast('Uğurlu', `"${data.title}" əlavə edildi`, 'success');
-                return inserted;
-            } catch (error) {
-                console.error('Add error:', error);
-                showToast('Xəta', 'Əlavə edərkən xəta baş verdi', 'error');
-                throw error;
+            // Try to add to Supabase
+            if (isSupabaseAvailable) {
+                try {
+                    const { error } = await supabase
+                        .from('qa_test_cases')
+                        .insert([newTC]);
+
+                    if (error) {
+                        console.warn('Supabase insert error:', error);
+                        showToast('Xəbərdarlıq', 'Məlumat lokalda saxlandı, sync edin', 'info');
+                    } else {
+                        isSupabaseWorking = true;
+                        showToast('Uğurlu', `"${data.title}" əlavə edildi`, 'success');
+                    }
+                } catch (e) {
+                    console.warn('Supabase insert error:', e);
+                    showToast('Xəbərdarlıq', 'Məlumat lokalda saxlandı, sync edin', 'info');
+                }
+            } else {
+                showToast('Xəbərdarlıq', 'Məlumat lokalda saxlandı', 'info');
             }
+
+            return newTC;
         }
 
         async function updateTestCase(id, updates) {
-            try {
-                const { data, error } = await supabase
-                    .from('qa_test_cases')
-                    .update(updates)
-                    .eq('id', id)
-                    .select()
-                    .single();
+            const index = testCases.findIndex(t => t.tc_id === id);
+            if (index === -1) return;
 
-                if (error) throw error;
+            // Update local
+            testCases[index] = { ...testCases[index], ...updates };
+            saveToLocalStorage();
+            renderCategories();
+            render();
 
-                const index = testCases.findIndex(t => t.id === id);
-                if (index !== -1) {
-                    testCases[index] = data;
+            // Try to update Supabase
+            if (isSupabaseAvailable) {
+                try {
+                    const { error } = await supabase
+                        .from('qa_test_cases')
+                        .update(updates)
+                        .eq('tc_id', id);
+
+                    if (error) {
+                        console.warn('Supabase update error:', error);
+                        showToast('Xəbərdarlıq', 'Lokal yeniləndi, sync edin', 'info');
+                    } else {
+                        showToast('Uğurlu', 'Test case yeniləndi', 'success');
+                    }
+                } catch (e) {
+                    console.warn('Supabase update error:', e);
+                    showToast('Xəbərdarlıq', 'Lokal yeniləndi, sync edin', 'info');
                 }
-                renderCategories();
-                render();
-                showToast('Uğurlu', 'Test case yeniləndi', 'success');
-                return data;
-            } catch (error) {
-                console.error('Update error:', error);
-                showToast('Xəta', 'Yeniləyərkən xəta baş verdi', 'error');
-                throw error;
             }
+
+            return testCases[index];
         }
 
         async function deleteTestCase(id) {
             if (!confirm('Bu test case-i silmək istədiyinizə əminsiniz?')) return;
 
-            try {
-                const { error } = await supabase
-                    .from('qa_test_cases')
-                    .delete()
-                    .eq('id', id);
+            // Delete local
+            const deleted = testCases.find(t => t.tc_id === id);
+            testCases = testCases.filter(t => t.tc_id !== id);
+            saveToLocalStorage();
+            renderCategories();
+            render();
 
-                if (error) throw error;
+            // Try to delete from Supabase
+            if (isSupabaseAvailable && deleted) {
+                try {
+                    const { error } = await supabase
+                        .from('qa_test_cases')
+                        .delete()
+                        .eq('tc_id', id);
 
-                testCases = testCases.filter(t => t.id !== id);
-                renderCategories();
-                render();
-                showToast('Uğurlu', 'Test case silindi', 'info');
-            } catch (error) {
-                console.error('Delete error:', error);
-                showToast('Xəta', 'Silərkən xəta baş verdi', 'error');
+                    if (error) {
+                        console.warn('Supabase delete error:', error);
+                        showToast('Xəbərdarlıq', 'Lokal silindi, sync edin', 'info');
+                    } else {
+                        showToast('Uğurlu', 'Test case silindi', 'success');
+                    }
+                } catch (e) {
+                    console.warn('Supabase delete error:', e);
+                    showToast('Xəbərdarlıq', 'Lokal silindi, sync edin', 'info');
+                }
+            } else {
+                showToast('Xəbərdarlıq', 'Lokal silindi', 'info');
             }
         }
 
+        // ============================================================
+        // WRAPPER FUNCTIONS
+        // ============================================================
         async function toggleStatus(id) {
-            const tc = testCases.find(t => t.id === id);
+            const tc = testCases.find(t => t.tc_id === id);
             if (!tc) return;
             const newStatus = tc.status === 'passed' ? 'not-tested' : 'passed';
             await updateTestCase(id, { status: newStatus });
@@ -1014,17 +1325,15 @@
         }
 
         // ============================================================
-        // RENDER CATEGORIES
+        // RENDER FUNCTIONS
         // ============================================================
+
         function renderCategories() {
             const container = document.getElementById('categoryFilter');
-
-            // Remove old category buttons (keep label)
             const label = container.querySelector('.filter-label');
             container.innerHTML = '';
             container.appendChild(label);
 
-            // Add "All" button
             const allCount = testCases.length;
             const allBtn = document.createElement('button');
             allBtn.className = `category-btn ${selectedCategory === 'all' ? 'active' : ''}`;
@@ -1033,7 +1342,6 @@
             allBtn.onclick = () => selectCategory('all');
             container.appendChild(allBtn);
 
-            // Add category buttons
             categories.forEach(cat => {
                 const count = testCases.filter(t => t.category === cat.id).length;
                 const btn = document.createElement('button');
@@ -1053,9 +1361,6 @@
             render();
         }
 
-        // ============================================================
-        // RENDER
-        // ============================================================
         function render() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const tbody = document.getElementById('tableBody');
@@ -1083,6 +1388,14 @@
             document.getElementById('retest').textContent = retest;
             document.getElementById('notTested').textContent = notTested;
 
+            // Update category counts
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                const cat = btn.dataset.category;
+                const count = cat === 'all' ? testCases.length : testCases.filter(t => t.category === cat).length;
+                const span = btn.querySelector('.count');
+                if (span) span.textContent = count;
+            });
+
             if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr><td colspan="7">
@@ -1104,7 +1417,7 @@
                         <td>
                             <label class="checkbox-custom">
                                 <input type="checkbox" ${tc.status === 'passed' ? 'checked' : ''} 
-                                       onchange="toggleStatus('${tc.id}')" />
+                                       onchange="toggleStatus('${tc.tc_id}')" />
                                 <span class="checkmark"><i class="fas fa-check"></i></span>
                             </label>
                         </td>
@@ -1117,7 +1430,7 @@
                             </div>
                         </td>
                         <td>
-                            <select class="td-select" onchange="updateStatus('${tc.id}', this.value)">
+                            <select class="td-select" onchange="updateStatus('${tc.tc_id}', this.value)">
                                 <option value="not-tested" ${tc.status === 'not-tested' ? 'selected' : ''}>⏳ Edilməyib</option>
                                 <option value="passed" ${tc.status === 'passed' ? 'selected' : ''}>✅ Keçdi</option>
                                 <option value="failed" ${tc.status === 'failed' ? 'selected' : ''}>❌ Uğursuz</option>
@@ -1127,7 +1440,7 @@
                         </td>
                         <td>
                             <select class="td-select td-select-priority ${tc.priority}" 
-                                    onchange="updatePriority('${tc.id}', this.value)">
+                                    onchange="updatePriority('${tc.tc_id}', this.value)">
                                 <option value="critical" ${tc.priority === 'critical' ? 'selected' : ''}>🔴 Critical</option>
                                 <option value="high" ${tc.priority === 'high' ? 'selected' : ''}>🟠 High</option>
                                 <option value="medium" ${tc.priority === 'medium' ? 'selected' : ''}>🔵 Medium</option>
@@ -1137,16 +1450,45 @@
                         <td>
                             <input class="bug-input" type="text" placeholder="BUG-ID" 
                                    value="${tc.bug_id || ''}" 
-                                   onchange="updateBug('${tc.id}', this.value)" />
+                                   onchange="updateBug('${tc.tc_id}', this.value)" />
                         </td>
                         <td>
-                            <button class="btn-delete" onclick="deleteTestCase('${tc.id}')" title="Sil">
+                            <button class="btn-delete" onclick="deleteTestCase('${tc.tc_id}')" title="Sil">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     </tr>
                 `;
             }).join('');
+        }
+
+        // ============================================================
+        // SYNC STATUS
+        // ============================================================
+        function updateSyncStatus(status, label) {
+            const dot = document.getElementById('syncDot');
+            const labelEl = document.getElementById('syncLabel');
+            const textEl = document.getElementById('statusText');
+
+            dot.className = `dot ${status}`;
+
+            switch (status) {
+                case 'online':
+                    labelEl.textContent = label || 'Online';
+                    textEl.textContent = '✅ Supabase ilə sinxron';
+                    break;
+                case 'offline':
+                    labelEl.textContent = label || 'Offline';
+                    textEl.textContent = '⚠️ Lokal rejim';
+                    break;
+                case 'syncing':
+                    labelEl.textContent = label || 'Sinxronizasiya...';
+                    textEl.textContent = '🔄 Sinxronizasiya davam edir...';
+                    break;
+                default:
+                    labelEl.textContent = label || 'Yüklənir...';
+                    textEl.textContent = '⏳ Yüklənir...';
+            }
         }
 
         // ============================================================
@@ -1186,7 +1528,7 @@
         // ============================================================
         function openModal(data = null) {
             const modal = document.getElementById('modal');
-            document.getElementById('editId').value = data ? data.id : '';
+            document.getElementById('editId').value = data ? data.tc_id : '';
             document.getElementById('formTitle').value = data ? data.title : '';
             document.getElementById('formDesc').value = data ? data.description : '';
             document.getElementById('formStatus').value = data ? data.status : 'not-tested';
@@ -1241,14 +1583,19 @@
                     await addTestCase(data);
                 }
                 closeModal();
-            } catch (error) {}
+            } catch (error) {
+                showToast('Xəta', 'Əməliyyat zamanı xəta', 'error');
+            }
         });
 
         // ============================================================
-        // SEARCH & REFRESH
+        // SEARCH, SYNC, REFRESH
         // ============================================================
         document.getElementById('searchInput').addEventListener('input', render);
-        document.getElementById('refreshBtn').addEventListener('click', loadTestCases);
+
+        document.getElementById('syncBtn').addEventListener('click', async () => {
+            await syncToSupabase();
+        });
 
         // ============================================================
         // KEYBOARD SHORTCUTS
@@ -1259,18 +1606,62 @@
                 openModal(); }
             if (e.ctrlKey && e.key === 'f') { e.preventDefault();
                 document.getElementById('searchInput').focus(); }
-            if (e.ctrlKey && e.key === 'r') { e.preventDefault();
-                loadTestCases(); }
+            if (e.ctrlKey && e.key === 's') { e.preventDefault();
+                syncToSupabase(); }
         });
 
         // ============================================================
-        // START
+        // INIT
         // ============================================================
-        loadTestCases();
+        async function init() {
+            updateSyncStatus('', 'Yüklənir...');
 
-        console.log('✅ NaviMax QA Checklist - Kateqoriyalı versiya yükləndi!');
-        console.log(`📂 ${categories.length} kateqoriya mövcuddur`);
-        console.log('⌨️ Qısayollar: Ctrl+N (Yeni), Ctrl+F (Axtar), Ctrl+R (Yenilə), ESC (Bağla)');
+            // Try to load from LocalStorage first
+            const hasLocal = loadFromLocalStorage();
+
+            if (hasLocal && testCases.length > 0) {
+                renderCategories();
+                render();
+                showToast('Info', `${testCases.length} test case lokalda yükləndi`, 'info');
+                updateSyncStatus('offline', 'Lokal rejim');
+            } else {
+                // No local data, use defaults
+                testCases = JSON.parse(JSON.stringify(defaultTestCases));
+                saveToLocalStorage();
+                renderCategories();
+                render();
+                showToast('Info', 'Default test case-lər yükləndi', 'info');
+                updateSyncStatus('offline', 'Default məlumatlar');
+            }
+
+            // Try to load from Supabase in background
+            if (isSupabaseAvailable) {
+                try {
+                    const supabaseLoaded = await loadFromSupabase();
+                    if (supabaseLoaded) {
+                        renderCategories();
+                        render();
+                        showToast('Uğurlu', 'Supabase məlumatları yükləndi', 'success');
+                        updateSyncStatus('online', 'Supabase ilə sinxron');
+                    } else {
+                        // If Supabase is empty, upload local data
+                        await syncToSupabase();
+                    }
+                } catch (e) {
+                    console.warn('Background sync error:', e);
+                    updateSyncStatus('offline', 'Supabase əlçatmaz');
+                }
+            } else {
+                updateSyncStatus('offline', 'Supabase əlçatmaz');
+            }
+
+            console.log('✅ NaviMax QA Checklist yükləndi!');
+            console.log(`📊 ${testCases.length} test case var`);
+            console.log('⌨️ Qısayollar: Ctrl+N (Yeni), Ctrl+F (Axtar), Ctrl+S (Sync), ESC (Bağla)');
+        }
+
+        // Start
+        init();
     </script>
 
 </body>
