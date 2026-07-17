@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -27,7 +26,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -53,7 +52,6 @@
             color: #4f8cf7;
             margin-right: 10px;
         }
-
         .header .subtitle {
             color: #6a6a82;
             font-size: 13px;
@@ -119,14 +117,6 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(79, 140, 247, 0.3);
         }
-        .btn-danger {
-            background: #ef4444;
-            border: none;
-            color: #fff;
-        }
-        .btn-danger:hover {
-            background: #dc2626;
-        }
 
         /* Stats */
         .stats {
@@ -167,20 +157,56 @@
             color: #4f8cf7;
         }
 
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
+        /* Category Filter */
+        .category-filter {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: #12121a;
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            align-items: center;
+        }
+        .category-filter .filter-label {
             color: #6a6a82;
+            font-size: 13px;
+            font-weight: 600;
+            margin-right: 8px;
         }
-        .loading i {
-            font-size: 32px;
-            animation: spin 1s linear infinite;
+        .category-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid #2a2a3e;
+            background: #0a0a0f;
+            color: #6a6a82;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+            white-space: nowrap;
         }
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
+        .category-btn:hover {
+            background: #1a1a2e;
+            border-color: #4f8cf7;
+            color: #e8e8f0;
+        }
+        .category-btn.active {
+            background: linear-gradient(135deg, #4f8cf7, #7c3aed);
+            border-color: #4f8cf7;
+            color: #fff;
+        }
+        .category-btn .count {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-left: 4px;
+        }
+        .category-btn.active .count {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Table */
@@ -274,7 +300,16 @@
             font-weight: 400;
             font-size: 12px;
             margin-top: 2px;
-            max-width: 300px;
+            max-width: 350px;
+        }
+        .tc-category {
+            font-size: 11px;
+            color: #6a6a82;
+            background: #0a0a0f;
+            padding: 2px 10px;
+            border-radius: 12px;
+            display: inline-block;
+            border: 1px solid #2a2a3e;
         }
 
         /* Badges */
@@ -323,7 +358,6 @@
             color: #6a6a82;
         }
 
-        /* Select dropdowns */
         .td-select {
             background: #0a0a0f;
             border: 1px solid #2a2a3e;
@@ -361,7 +395,6 @@
             border-color: #6a6a82;
         }
 
-        /* Bug input */
         .bug-input {
             background: #0a0a0f;
             border: 1px solid #2a2a3e;
@@ -405,6 +438,21 @@
             font-size: 40px;
             margin-bottom: 12px;
             display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6a6a82;
+        }
+        .loading i {
+            font-size: 32px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Toast */
@@ -609,6 +657,13 @@
             .stats {
                 grid-template-columns: repeat(3, 1fr);
             }
+            .category-filter {
+                flex-wrap: wrap;
+            }
+            .category-btn {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
             table {
                 font-size: 12px;
             }
@@ -673,6 +728,13 @@
             <div class="stat-box"><div class="num yellow" id="blocked">0</div><div class="label">🚫 Bloklanıb</div></div>
             <div class="stat-box"><div class="num purple" id="retest">0</div><div class="label">🔄 Retest</div></div>
             <div class="stat-box"><div class="num" id="notTested" style="color:#6a6a82;">0</div><div class="label">⏳ Edilməyib</div></div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="category-filter" id="categoryFilter">
+            <span class="filter-label"><i class="fas fa-tags"></i> Kateqoriya:</span>
+            <button class="category-btn active" data-category="all">Hamısı <span class="count" id="countAll">0</span></button>
+            <!-- Dynamic categories -->
         </div>
 
         <!-- Table -->
@@ -743,24 +805,23 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Bug ID</label>
-                    <input type="text" id="formBug" placeholder="Məs: BUG-123" />
+                    <label>Kateqoriya</label>
+                    <select id="formCategory">
+                        <option value="Login / Register">🔐 Login / Register</option>
+                        <option value="Ana səhifə">🏠 Ana səhifə</option>
+                        <option value="Xəritə">🗺️ Xəritə</option>
+                        <option value="Obyektlər">📦 Obyektlər</option>
+                        <option value="Tarixçə">📜 Tarixçə</option>
+                        <option value="Maşın İzləmə">🚗 Maşın İzləmə</option>
+                        <option value="Bildirişlər">🔔 Bildirişlər</option>
+                        <option value="Kart">💳 Kart</option>
+                        <option value="Balans">💰 Balans</option>
+                        <option value="Logout">🚪 Logout</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label>Bölmə</label>
-                    <select id="formSection">
-                        <option value="Login / Register">Login / Register</option>
-                        <option value="Ana səhifə">Ana səhifə</option>
-                        <option value="Xəritə">Xəritə</option>
-                        <option value="Obyektlər">Obyektlər</option>
-                        <option value="Tarixçə">Tarixçə</option>
-                        <option value="Maşın İzləmə">Maşın İzləmə</option>
-                        <option value="Bildirişlər">Bildirişlər</option>
-                        <option value="Kart">Kart</option>
-                        <option value="Balans">Balans</option>
-                        <option value="Logout">Logout</option>
-                        <option value="Digər">Digər</option>
-                    </select>
+                    <label>Bug ID</label>
+                    <input type="text" id="formBug" placeholder="Məs: BUG-123" />
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" id="modalCancel">Ləğv et</button>
@@ -787,23 +848,39 @@
         // ============================================================
         let testCases = [];
         let isLoading = false;
+        let selectedCategory = 'all';
+
+        // ============================================================
+        // CATEGORIES (SABİT)
+        // ============================================================
+        const categories = [
+            { id: 'Login / Register', icon: '🔐', label: 'Login / Register' },
+            { id: 'Ana səhifə', icon: '🏠', label: 'Ana səhifə' },
+            { id: 'Xəritə', icon: '🗺️', label: 'Xəritə' },
+            { id: 'Obyektlər', icon: '📦', label: 'Obyektlər' },
+            { id: 'Tarixçə', icon: '📜', label: 'Tarixçə' },
+            { id: 'Maşın İzləmə', icon: '🚗', label: 'Maşın İzləmə' },
+            { id: 'Bildirişlər', icon: '🔔', label: 'Bildirişlər' },
+            { id: 'Kart', icon: '💳', label: 'Kart' },
+            { id: 'Balans', icon: '💰', label: 'Balans' },
+            { id: 'Logout', icon: '🚪', label: 'Logout' }
+        ];
 
         // ============================================================
         // CRUD FUNCTIONS
         // ============================================================
 
-        // Load all test cases
         async function loadTestCases() {
             if (isLoading) return;
             isLoading = true;
             document.getElementById('tableBody').innerHTML = `
-                    <tr><td colspan="7">
-                        <div class="loading">
-                            <i class="fas fa-spinner"></i>
-                            <p>Məlumatlar yüklənir...</p>
-                        </div>
-                    </td></tr>
-                `;
+                <tr><td colspan="7">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Məlumatlar yüklənir...</p>
+                    </div>
+                </td></tr>
+            `;
 
             try {
                 const { data, error } = await supabase
@@ -814,29 +891,28 @@
                 if (error) throw error;
 
                 testCases = data || [];
+                renderCategories();
                 render();
                 showToast('Uğurlu', `${testCases.length} test case yükləndi`, 'success');
             } catch (error) {
                 console.error('Load error:', error);
                 showToast('Xəta', 'Məlumatlar yüklənərkən xəta baş verdi', 'error');
                 document.getElementById('tableBody').innerHTML = `
-                        <tr><td colspan="7">
-                            <div class="empty-state">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <h3>Xəta baş verdi</h3>
-                                <p>${error.message}</p>
-                            </div>
-                        </td></tr>
-                    `;
+                    <tr><td colspan="7">
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Xəta baş verdi</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    </td></tr>
+                `;
             } finally {
                 isLoading = false;
             }
         }
 
-        // Add new test case
         async function addTestCase(data) {
             try {
-                // Generate TC ID
                 const maxNum = testCases.reduce((max, t) => {
                     const num = parseInt(t.tc_id.replace('TC-', ''));
                     return num > max ? num : max;
@@ -849,10 +925,10 @@
                         tc_id: tcId,
                         title: data.title,
                         description: data.description || '',
+                        category: data.category || 'Digər',
                         status: data.status || 'not-tested',
                         priority: data.priority || 'medium',
-                        bug_id: data.bug || null,
-                        section: data.section || 'Digər'
+                        bug_id: data.bug || null
                     }])
                     .select()
                     .single();
@@ -860,6 +936,7 @@
                 if (error) throw error;
 
                 testCases.unshift(inserted);
+                renderCategories();
                 render();
                 showToast('Uğurlu', `"${data.title}" əlavə edildi`, 'success');
                 return inserted;
@@ -870,7 +947,6 @@
             }
         }
 
-        // Update test case
         async function updateTestCase(id, updates) {
             try {
                 const { data, error } = await supabase
@@ -886,6 +962,7 @@
                 if (index !== -1) {
                     testCases[index] = data;
                 }
+                renderCategories();
                 render();
                 showToast('Uğurlu', 'Test case yeniləndi', 'success');
                 return data;
@@ -896,7 +973,6 @@
             }
         }
 
-        // Delete test case
         async function deleteTestCase(id) {
             if (!confirm('Bu test case-i silmək istədiyinizə əminsiniz?')) return;
 
@@ -909,6 +985,7 @@
                 if (error) throw error;
 
                 testCases = testCases.filter(t => t.id !== id);
+                renderCategories();
                 render();
                 showToast('Uğurlu', 'Test case silindi', 'info');
             } catch (error) {
@@ -917,28 +994,63 @@
             }
         }
 
-        // Toggle status via checkbox
         async function toggleStatus(id) {
             const tc = testCases.find(t => t.id === id);
             if (!tc) return;
-
             const newStatus = tc.status === 'passed' ? 'not-tested' : 'passed';
             await updateTestCase(id, { status: newStatus });
         }
 
-        // Update status from dropdown
         async function updateStatus(id, value) {
             await updateTestCase(id, { status: value });
         }
 
-        // Update priority from dropdown
         async function updatePriority(id, value) {
             await updateTestCase(id, { priority: value });
         }
 
-        // Update bug ID
         async function updateBug(id, value) {
             await updateTestCase(id, { bug_id: value || null });
+        }
+
+        // ============================================================
+        // RENDER CATEGORIES
+        // ============================================================
+        function renderCategories() {
+            const container = document.getElementById('categoryFilter');
+
+            // Remove old category buttons (keep label)
+            const label = container.querySelector('.filter-label');
+            container.innerHTML = '';
+            container.appendChild(label);
+
+            // Add "All" button
+            const allCount = testCases.length;
+            const allBtn = document.createElement('button');
+            allBtn.className = `category-btn ${selectedCategory === 'all' ? 'active' : ''}`;
+            allBtn.dataset.category = 'all';
+            allBtn.innerHTML = `Hamısı <span class="count">${allCount}</span>`;
+            allBtn.onclick = () => selectCategory('all');
+            container.appendChild(allBtn);
+
+            // Add category buttons
+            categories.forEach(cat => {
+                const count = testCases.filter(t => t.category === cat.id).length;
+                const btn = document.createElement('button');
+                btn.className = `category-btn ${selectedCategory === cat.id ? 'active' : ''}`;
+                btn.dataset.category = cat.id;
+                btn.innerHTML = `${cat.icon} ${cat.label} <span class="count">${count}</span>`;
+                btn.onclick = () => selectCategory(cat.id);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.category === category);
+            });
+            render();
         }
 
         // ============================================================
@@ -948,11 +1060,13 @@
             const search = document.getElementById('searchInput').value.toLowerCase();
             const tbody = document.getElementById('tableBody');
 
-            let filtered = testCases.filter(tc =>
-                tc.title.toLowerCase().includes(search) ||
-                tc.tc_id.toLowerCase().includes(search) ||
-                (tc.bug_id && tc.bug_id.toLowerCase().includes(search))
-            );
+            let filtered = testCases.filter(tc => {
+                const matchSearch = tc.title.toLowerCase().includes(search) ||
+                    tc.tc_id.toLowerCase().includes(search) ||
+                    (tc.bug_id && tc.bug_id.toLowerCase().includes(search));
+                const matchCategory = selectedCategory === 'all' || tc.category === selectedCategory;
+                return matchSearch && matchCategory;
+            });
 
             // Stats
             const total = testCases.length;
@@ -971,18 +1085,21 @@
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `
-                        <tr><td colspan="7">
-                            <div class="empty-state">
-                                <i class="fas fa-inbox"></i>
-                                <h3>Heç bir test case tapılmadı</h3>
-                                <p>Yeni test case əlavə etmək üçün "Yeni Test" düyməsinə klikləyin</p>
-                            </div>
-                        </td></tr>
-                    `;
+                    <tr><td colspan="7">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>Heç bir test case tapılmadı</h3>
+                            <p>Yeni test case əlavə etmək üçün "Yeni Test" düyməsinə klikləyin</p>
+                        </div>
+                    </td></tr>
+                `;
                 return;
             }
 
-            tbody.innerHTML = filtered.map(tc => `
+            tbody.innerHTML = filtered.map(tc => {
+                const cat = categories.find(c => c.id === tc.category);
+                const icon = cat ? cat.icon : '📌';
+                return `
                     <tr>
                         <td>
                             <label class="checkbox-custom">
@@ -996,7 +1113,7 @@
                             <div class="tc-title">
                                 ${tc.title}
                                 <small>${tc.description || 'Təsvir yoxdur'}</small>
-                                ${tc.section ? `<small><i class="fas fa-folder"></i> ${tc.section}</small>` : ''}
+                                <span class="tc-category">${icon} ${tc.category}</span>
                             </div>
                         </td>
                         <td>
@@ -1028,7 +1145,8 @@
                             </button>
                         </td>
                     </tr>
-                `).join('');
+                `;
+            }).join('');
         }
 
         // ============================================================
@@ -1045,21 +1163,21 @@
 
             toast.className = `toast ${type}`;
             toast.innerHTML = `
-                    <i class="fas ${icons[type] || icons.info}"></i>
-                    <div>
-                        <div style="font-weight:600;font-size:14px;">${title}</div>
-                        <div style="font-size:13px;color:#6a6a82;">${message}</div>
-                    </div>
-                    <button style="background:transparent;border:none;color:#6a6a82;cursor:pointer;font-size:16px;" 
-                            onclick="this.parentElement.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
+                <i class="fas ${icons[type] || icons.info}"></i>
+                <div>
+                    <div style="font-weight:600;font-size:14px;">${title}</div>
+                    <div style="font-size:13px;color:#6a6a82;">${message}</div>
+                </div>
+                <button style="background:transparent;border:none;color:#6a6a82;cursor:pointer;font-size:16px;" 
+                        onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
 
             container.appendChild(toast);
             setTimeout(() => {
                 toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 300);
+                setTimeout(() => toast.remove(), 4000);
             }, 4000);
         }
 
@@ -1073,8 +1191,8 @@
             document.getElementById('formDesc').value = data ? data.description : '';
             document.getElementById('formStatus').value = data ? data.status : 'not-tested';
             document.getElementById('formPriority').value = data ? data.priority : 'medium';
+            document.getElementById('formCategory').value = data ? data.category : 'Login / Register';
             document.getElementById('formBug').value = data ? data.bug_id : '';
-            document.getElementById('formSection').value = data ? data.section : 'Digər';
 
             document.getElementById('modalTitle').textContent = data ? 'Test Case Redaktə et' : 'Yeni Test Case';
             document.getElementById('modalSubmit').textContent = data ? 'Yenilə' : 'Yarat';
@@ -1100,8 +1218,8 @@
                 description: document.getElementById('formDesc').value.trim(),
                 status: document.getElementById('formStatus').value,
                 priority: document.getElementById('formPriority').value,
-                bug: document.getElementById('formBug').value.trim(),
-                section: document.getElementById('formSection').value
+                category: document.getElementById('formCategory').value,
+                bug: document.getElementById('formBug').value.trim()
             };
 
             if (!data.title) {
@@ -1111,33 +1229,25 @@
 
             try {
                 if (id) {
-                    // Edit
                     await updateTestCase(id, {
                         title: data.title,
                         description: data.description,
                         status: data.status,
                         priority: data.priority,
-                        bug_id: data.bug || null,
-                        section: data.section
+                        category: data.category,
+                        bug_id: data.bug || null
                     });
                 } else {
-                    // Create
                     await addTestCase(data);
                 }
                 closeModal();
-            } catch (error) {
-                // Error already handled in functions
-            }
+            } catch (error) {}
         });
 
         // ============================================================
-        // SEARCH
+        // SEARCH & REFRESH
         // ============================================================
         document.getElementById('searchInput').addEventListener('input', render);
-
-        // ============================================================
-        // REFRESH
-        // ============================================================
         document.getElementById('refreshBtn').addEventListener('click', loadTestCases);
 
         // ============================================================
@@ -1145,18 +1255,12 @@
         // ============================================================
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
-            if (e.ctrlKey && e.key === 'n') {
-                e.preventDefault();
-                openModal();
-            }
-            if (e.ctrlKey && e.key === 'f') {
-                e.preventDefault();
-                document.getElementById('searchInput').focus();
-            }
-            if (e.ctrlKey && e.key === 'r') {
-                e.preventDefault();
-                loadTestCases();
-            }
+            if (e.ctrlKey && e.key === 'n') { e.preventDefault();
+                openModal(); }
+            if (e.ctrlKey && e.key === 'f') { e.preventDefault();
+                document.getElementById('searchInput').focus(); }
+            if (e.ctrlKey && e.key === 'r') { e.preventDefault();
+                loadTestCases(); }
         });
 
         // ============================================================
@@ -1164,8 +1268,8 @@
         // ============================================================
         loadTestCases();
 
-        console.log('✅ NaviMax QA Checklist - Supabase versiya yükləndi!');
-        console.log('🔗 Supabase URL:', SUPABASE_URL);
+        console.log('✅ NaviMax QA Checklist - Kateqoriyalı versiya yükləndi!');
+        console.log(`📂 ${categories.length} kateqoriya mövcuddur`);
         console.log('⌨️ Qısayollar: Ctrl+N (Yeni), Ctrl+F (Axtar), Ctrl+R (Yenilə), ESC (Bağla)');
     </script>
 
