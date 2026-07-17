@@ -3,17 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manual QA Test Management System</title>
+    <title>NaviMax QA Checklist - Supabase</title>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <!-- Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-    </script>
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         * {
@@ -22,904 +18,396 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-card: #1a1a2e;
-            --bg-card-hover: #22223a;
-            --border-color: #2a2a3e;
-            --text-primary: #e8e8f0;
-            --text-secondary: #a0a0b8;
-            --text-muted: #6a6a82;
-            --accent-blue: #4f8cf7;
-            --accent-purple: #7c3aed;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-yellow: #f59e0b;
-            --accent-pink: #ec4899;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background: #0a0a0f;
+            color: #e8e8f0;
+            padding: 20px;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-blue);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-purple);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 72px;
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 0;
-            z-index: 1000;
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .sidebar:hover {
-            width: 240px;
-        }
-
-        .sidebar .logo {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 18px;
-            color: #fff;
-            margin-bottom: 30px;
-            flex-shrink: 0;
-            transition: var(--transition);
-        }
-
-        .sidebar:hover .logo {
-            width: 200px;
-        }
-
-        .sidebar .logo span {
-            display: none;
-        }
-
-        .sidebar:hover .logo span {
-            display: inline;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            width: 100%;
-            padding: 0 12px;
-        }
-
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 14px;
-            border-radius: 12px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .sidebar-nav a i {
-            font-size: 18px;
-            min-width: 20px;
-            text-align: center;
-        }
-
-        .sidebar-nav a span {
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .sidebar:hover .sidebar-nav a span {
-            opacity: 1;
-        }
-
-        .sidebar-nav a:hover {
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        .sidebar-nav a.active {
-            background: var(--bg-card);
-            color: var(--accent-blue);
-        }
-
-        .sidebar-nav a.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 24px;
-            background: var(--accent-blue);
-            border-radius: 0 4px 4px 0;
-        }
-
-        .sidebar-bottom {
-            padding: 12px;
-            width: 100%;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .sidebar-bottom a {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 10px 14px;
-            border-radius: 12px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        .sidebar-bottom a i {
-            font-size: 18px;
-            min-width: 20px;
-            text-align: center;
-        }
-
-        .sidebar-bottom a span {
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .sidebar:hover .sidebar-bottom a span {
-            opacity: 1;
-        }
-
-        .sidebar-bottom a:hover {
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 72px;
-            padding: 24px 32px;
-            min-height: 100vh;
-            transition: var(--transition);
-        }
-
-        .sidebar:hover~.main-content {
-            margin-left: 240px;
-        }
-
-        /* Top Bar */
-        .top-bar {
+        /* Header */
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
             padding: 16px 24px;
-            background: var(--bg-secondary);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
+            background: #12121a;
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
-        .top-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .top-bar-left h1 {
-            font-size: 20px;
+        .header h1 {
+            font-size: 22px;
             font-weight: 700;
         }
-
-        .top-bar-left .breadcrumb {
-            color: var(--text-secondary);
-            font-size: 14px;
+        .header h1 i {
+            color: #4f8cf7;
+            margin-right: 10px;
         }
 
-        .top-bar-left .breadcrumb span {
-            color: var(--text-primary);
+        .header .subtitle {
+            color: #6a6a82;
+            font-size: 13px;
         }
 
-        .top-bar-right {
+        .header-actions {
             display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
             align-items: center;
-            gap: 12px;
         }
 
         .search-box {
             display: flex;
             align-items: center;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 8px 14px;
+            background: #0a0a0f;
+            border: 1px solid #2a2a3e;
+            border-radius: 10px;
+            padding: 6px 14px;
             gap: 10px;
-            transition: var(--transition);
         }
-
-        .search-box:focus-within {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(79, 140, 247, 0.1);
-        }
-
-        .search-box i {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
         .search-box input {
             background: transparent;
             border: none;
             outline: none;
-            color: var(--text-primary);
+            color: #e8e8f0;
             font-size: 14px;
-            width: 200px;
             font-family: 'Inter', sans-serif;
+            width: 200px;
         }
-
         .search-box input::placeholder {
-            color: var(--text-muted);
+            color: #6a6a82;
+        }
+        .search-box i {
+            color: #6a6a82;
         }
 
-        .top-btn {
-            padding: 8px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+        .btn {
+            padding: 8px 18px;
+            border-radius: 10px;
+            border: 1px solid #2a2a3e;
+            background: #0a0a0f;
+            color: #e8e8f0;
             cursor: pointer;
-            transition: var(--transition);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            display: flex;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-family: 'Inter', sans-serif;
         }
-
-        .top-btn:hover {
-            background: var(--bg-card);
-            border-color: var(--accent-blue);
+        .btn:hover {
+            background: #1a1a2e;
+            border-color: #4f8cf7;
         }
-
-        .top-btn.primary {
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+        .btn-primary {
+            background: linear-gradient(135deg, #4f8cf7, #7c3aed);
             border: none;
             color: #fff;
         }
-
-        .top-btn.primary:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(79, 140, 247, 0.3);
         }
-
-        .avatar-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-            border: 2px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
-            transition: var(--transition);
-        }
-
-        .avatar-btn:hover {
-            border-color: var(--accent-blue);
-            transform: scale(1.05);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .stat-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 20px 24px;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent-blue);
-        }
-
-        .stat-card .stat-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-
-        .stat-card .stat-icon.blue {
-            background: rgba(79, 140, 247, 0.15);
-            color: var(--accent-blue);
-        }
-        .stat-card .stat-icon.green {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-        }
-        .stat-card .stat-icon.red {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--accent-red);
-        }
-        .stat-card .stat-icon.yellow {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent-yellow);
-        }
-        .stat-card .stat-icon.purple {
-            background: rgba(124, 58, 237, 0.15);
-            color: var(--accent-purple);
-        }
-
-        .stat-card .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-
-        .stat-card .stat-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .stat-card .stat-change {
-            font-size: 12px;
-            margin-top: 8px;
-            padding: 2px 10px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-
-        .stat-card .stat-change.up {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-        }
-
-        .stat-card .stat-change.down {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--accent-red);
-        }
-
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 24px;
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            border-color: rgba(79, 140, 247, 0.2);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-header h3 {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .card-header .card-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .card-header .card-actions button {
-            padding: 4px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 12px;
-            transition: var(--transition);
-            font-family: 'Inter', sans-serif;
-        }
-
-        .card-header .card-actions button:hover {
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        .card-header .card-actions button.active {
-            background: var(--accent-blue);
+        .btn-danger {
+            background: #ef4444;
+            border: none;
             color: #fff;
-            border-color: var(--accent-blue);
+        }
+        .btn-danger:hover {
+            background: #dc2626;
         }
 
-        .chart-container {
-            height: 280px;
-            position: relative;
-        }
-
-        /* Test Cases Table */
-        .test-cases-section {
-            margin-top: 32px;
-        }
-
-        .test-cases-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
             margin-bottom: 20px;
         }
-
-        .test-cases-header h2 {
-            font-size: 18px;
+        .stat-box {
+            background: #12121a;
+            border: 1px solid #2a2a3e;
+            border-radius: 10px;
+            padding: 12px 16px;
+            text-align: center;
+        }
+        .stat-box .num {
+            font-size: 24px;
             font-weight: 700;
         }
-
-        .test-cases-header .filters {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
+        .stat-box .label {
+            font-size: 11px;
+            color: #6a6a82;
+            margin-top: 2px;
+        }
+        .stat-box .num.green {
+            color: #10b981;
+        }
+        .stat-box .num.red {
+            color: #ef4444;
+        }
+        .stat-box .num.yellow {
+            color: #f59e0b;
+        }
+        .stat-box .num.purple {
+            color: #7c3aed;
+        }
+        .stat-box .num.blue {
+            color: #4f8cf7;
         }
 
-        .filter-select {
-            padding: 8px 14px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 13px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            transition: var(--transition);
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6a6a82;
+        }
+        .loading i {
+            font-size: 32px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-        }
-
-        .filter-select option {
-            background: var(--bg-secondary);
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
+        /* Table */
+        .table-wrap {
+            background: #12121a;
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        thead {
-            background: var(--bg-primary);
-        }
-
-        thead th {
-            padding: 14px 18px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        thead th:hover {
-            color: var(--text-primary);
-        }
-
-        thead th i {
-            margin-left: 6px;
-            font-size: 11px;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border-color);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        tbody tr:hover {
-            background: var(--bg-card);
-        }
-
-        tbody td {
-            padding: 14px 18px;
-            vertical-align: middle;
-        }
-
-        .tc-id {
-            font-weight: 600;
-            color: var(--accent-blue);
-            font-size: 12px;
-        }
-
-        .tc-title {
-            font-weight: 500;
-        }
-
-        .tc-title small {
-            color: var(--text-secondary);
-            font-weight: 400;
-            font-size: 12px;
-            display: block;
-            margin-top: 2px;
-        }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            display: inline-block;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .badge.status-passed {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-        }
-        .badge.status-failed {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--accent-red);
-        }
-        .badge.status-blocked {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent-yellow);
-        }
-        .badge.status-retest {
-            background: rgba(124, 58, 237, 0.15);
-            color: var(--accent-purple);
-        }
-        .badge.status-not-tested {
-            background: rgba(106, 106, 130, 0.15);
-            color: var(--text-muted);
-        }
-
-        .badge.priority-critical {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--accent-red);
-        }
-        .badge.priority-high {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent-yellow);
-        }
-        .badge.priority-medium {
-            background: rgba(79, 140, 247, 0.15);
-            color: var(--accent-blue);
-        }
-        .badge.priority-low {
-            background: rgba(106, 106, 130, 0.15);
-            color: var(--text-muted);
-        }
-
-        .td-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .td-actions button {
-            padding: 4px 8px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            border-radius: 6px;
-            transition: var(--transition);
             font-size: 13px;
         }
 
-        .td-actions button:hover {
-            background: var(--bg-card);
-            color: var(--text-primary);
+        thead {
+            background: #0a0a0f;
+        }
+        thead th {
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            color: #6a6a82;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 1px solid #2a2a3e;
         }
 
-        .td-actions button.delete:hover {
-            color: var(--accent-red);
+        tbody tr {
+            border-bottom: 1px solid #1a1a2e;
+            transition: 0.2s;
+        }
+        tbody tr:hover {
+            background: #1a1a2e;
+        }
+        tbody td {
+            padding: 10px 14px;
+            vertical-align: middle;
         }
 
         /* Custom Checkbox */
-        .custom-checkbox {
+        .checkbox-custom {
             display: flex;
             align-items: center;
             gap: 10px;
             cursor: pointer;
-            position: relative;
-            user-select: none;
         }
-
-        .custom-checkbox input {
+        .checkbox-custom input {
             display: none;
         }
-
-        .custom-checkbox .checkmark {
+        .checkbox-custom .checkmark {
             width: 20px;
             height: 20px;
-            border: 2px solid var(--border-color);
+            border: 2px solid #3a3a4e;
             border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition);
+            transition: 0.2s;
             flex-shrink: 0;
-            position: relative;
         }
-
-        .custom-checkbox .checkmark i {
-            opacity: 0;
-            transform: scale(0);
-            transition: var(--transition);
+        .checkbox-custom .checkmark i {
             font-size: 12px;
             color: #fff;
+            opacity: 0;
+            transform: scale(0);
+            transition: 0.2s;
         }
-
-        .custom-checkbox input:checked+.checkmark {
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            border-color: var(--accent-blue);
-            animation: checkboxPop 0.3s ease;
+        .checkbox-custom input:checked+.checkmark {
+            background: #4f8cf7;
+            border-color: #4f8cf7;
         }
-
-        .custom-checkbox input:checked+.checkmark i {
+        .checkbox-custom input:checked+.checkmark i {
             opacity: 1;
             transform: scale(1);
         }
 
-        @keyframes checkboxPop {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(0.8);
-            }
-            100% {
-                transform: scale(1);
-            }
+        .tc-id {
+            font-weight: 600;
+            color: #4f8cf7;
+            font-size: 12px;
         }
-
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease;
+        .tc-title {
+            font-weight: 500;
         }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 32px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .modal-header h2 {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            width: 36px;
-            height: 36px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 16px;
-        }
-
-        .modal-close:hover {
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
+        .tc-title small {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
+            color: #6a6a82;
+            font-weight: 400;
+            font-size: 12px;
+            margin-top: 2px;
+            max-width: 300px;
         }
 
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 14px;
+        /* Badges */
+        .badge {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge.passed {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+        .badge.failed {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+        .badge.blocked {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+        .badge.retest {
+            background: rgba(124, 58, 237, 0.15);
+            color: #7c3aed;
+        }
+        .badge.not-tested {
+            background: rgba(106, 106, 130, 0.15);
+            color: #6a6a82;
+        }
+
+        .badge.critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        .badge.high {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        .badge.medium {
+            background: rgba(79, 140, 247, 0.2);
+            color: #4f8cf7;
+        }
+        .badge.low {
+            background: rgba(106, 106, 130, 0.2);
+            color: #6a6a82;
+        }
+
+        /* Select dropdowns */
+        .td-select {
+            background: #0a0a0f;
+            border: 1px solid #2a2a3e;
+            border-radius: 8px;
+            color: #e8e8f0;
+            padding: 4px 10px;
+            font-size: 12px;
             font-family: 'Inter', sans-serif;
-            transition: var(--transition);
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(79, 140, 247, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .form-actions button {
-            padding: 10px 24px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            font-size: 14px;
             cursor: pointer;
-            transition: var(--transition);
+            transition: 0.2s;
+            min-width: 110px;
+        }
+        .td-select:focus {
+            outline: none;
+            border-color: #4f8cf7;
+        }
+        .td-select option {
+            background: #12121a;
+            color: #e8e8f0;
+        }
+
+        .td-select-priority {
+            min-width: 90px;
+        }
+        .td-select-priority.critical {
+            border-color: #ef4444;
+        }
+        .td-select-priority.high {
+            border-color: #f59e0b;
+        }
+        .td-select-priority.medium {
+            border-color: #4f8cf7;
+        }
+        .td-select-priority.low {
+            border-color: #6a6a82;
+        }
+
+        /* Bug input */
+        .bug-input {
+            background: #0a0a0f;
+            border: 1px solid #2a2a3e;
+            border-radius: 8px;
+            color: #e8e8f0;
+            padding: 4px 10px;
+            font-size: 12px;
             font-family: 'Inter', sans-serif;
+            width: 90px;
+            transition: 0.2s;
+        }
+        .bug-input:focus {
+            outline: none;
+            border-color: #4f8cf7;
+        }
+        .bug-input::placeholder {
+            color: #4a4a5e;
         }
 
-        .form-actions .btn-secondary {
-            background: var(--bg-primary);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: #6a6a82;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .btn-delete:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
         }
 
-        .form-actions .btn-secondary:hover {
-            background: var(--bg-card);
-            color: var(--text-primary);
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6a6a82;
+        }
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: block;
         }
 
-        .form-actions .btn-primary {
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            color: #fff;
-        }
-
-        .form-actions .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(79, 140, 247, 0.3);
-        }
-
-        /* Toast Notification */
+        /* Toast */
         .toast-container {
             position: fixed;
             bottom: 24px;
@@ -929,56 +417,27 @@
             flex-direction: column;
             gap: 10px;
         }
-
         .toast {
-            padding: 16px 24px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            min-width: 300px;
+            padding: 14px 20px;
+            background: #12121a;
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            min-width: 280px;
             display: flex;
             align-items: center;
             gap: 12px;
             animation: slideIn 0.4s ease;
-            box-shadow: var(--shadow);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
-
-        .toast i {
-            font-size: 20px;
-        }
-
         .toast.success i {
-            color: var(--accent-green);
+            color: #10b981;
         }
         .toast.error i {
-            color: var(--accent-red);
+            color: #ef4444;
         }
         .toast.info i {
-            color: var(--accent-blue);
+            color: #4f8cf7;
         }
-
-        .toast .toast-content {
-            flex: 1;
-        }
-
-        .toast .toast-title {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .toast .toast-message {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .toast .toast-close {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 16px;
-        }
-
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
@@ -989,11 +448,9 @@
                 opacity: 1;
             }
         }
-
         .toast.hide {
             animation: slideOut 0.3s ease forwards;
         }
-
         @keyframes slideOut {
             to {
                 transform: translateX(100%);
@@ -1001,551 +458,503 @@
             }
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #12121a;
+            border: 1px solid #2a2a3e;
+            border-radius: 14px;
+            padding: 28px;
+            max-width: 520px;
+            width: 92%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from {
+                transform: scale(0.95) translateY(20px);
+                opacity: 0;
             }
-            .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
             }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .modal-close {
+            background: transparent;
+            border: 1px solid #2a2a3e;
+            border-radius: 10px;
+            color: #6a6a82;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        .modal-close:hover {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6a6a82;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0a0a0f;
+            border: 1px solid #2a2a3e;
+            border-radius: 10px;
+            color: #e8e8f0;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4f8cf7;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid #1a1a2e;
+        }
+        .form-actions button {
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+        }
+        .btn-secondary {
+            background: #0a0a0f;
+            color: #6a6a82;
+            border: 1px solid #2a2a3e;
+        }
+        .btn-secondary:hover {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .btn-primary-modal {
+            background: linear-gradient(135deg, #4f8cf7, #7c3aed);
+            border: none;
+            color: #fff;
+        }
+        .btn-primary-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(79, 140, 247, 0.3);
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                width: 0;
-                padding: 0;
-                overflow: hidden;
+            body {
+                padding: 12px;
             }
-
-            .main-content {
-                margin-left: 0;
-                padding: 16px;
-            }
-
-            .top-bar {
+            .header {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 12px;
             }
-
-            .top-bar-right {
-                flex-wrap: wrap;
+            .header-actions {
+                flex-direction: column;
             }
-
             .search-box input {
-                width: 120px;
+                width: 100%;
             }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
             }
-
+            table {
+                font-size: 12px;
+            }
+            thead th,
+            tbody td {
+                padding: 6px 8px;
+            }
+            .td-select {
+                min-width: 80px;
+                font-size: 11px;
+                padding: 2px 6px;
+            }
+            .bug-input {
+                width: 60px;
+                font-size: 11px;
+                padding: 2px 6px;
+            }
+            .tc-title small {
+                max-width: 150px;
+            }
             .form-row {
                 grid-template-columns: 1fr;
-            }
-
-            .test-cases-header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-
-            .modal {
-                padding: 20px;
-                max-width: 95%;
             }
         }
 
         @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
             }
-
-            .top-bar-left h1 {
-                font-size: 16px;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            thead th,
-            tbody td {
-                padding: 10px 12px;
-            }
-
-            .badge {
-                font-size: 10px;
-                padding: 2px 8px;
-            }
-        }
-
-        /* Dark mode toggle */
-        .dark-mode-toggle {
-            position: fixed;
-            bottom: 24px;
-            left: 24px;
-            z-index: 1500;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 20px;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
-        }
-
-        .dark-mode-toggle:hover {
-            transform: scale(1.1);
-            border-color: var(--accent-blue);
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 48px 24px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--text-muted);
-        }
-
-        .empty-state h3 {
-            font-size: 18px;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="logo">
-            QA
-            <span>Test Manager</span>
-        </div>
+    <div class="container">
 
-        <nav class="sidebar-nav">
-            <a href="#" class="active" data-page="dashboard">
-                <i class="fas fa-th-large"></i>
-                <span>İdarə Paneli</span>
-            </a>
-            <a href="#" data-page="projects">
-                <i class="fas fa-folder"></i>
-                <span>Layihələr</span>
-            </a>
-            <a href="#" data-page="test-cases">
-                <i class="fas fa-clipboard-list"></i>
-                <span>Test Case-lər</span>
-            </a>
-            <a href="#" data-page="sections">
-                <i class="fas fa-layer-group"></i>
-                <span>Bölmələr</span>
-            </a>
-            <a href="#" data-page="reports">
-                <i class="fas fa-chart-bar"></i>
-                <span>Hesabatlar</span>
-            </a>
-            <a href="#" data-page="activity">
-                <i class="fas fa-history"></i>
-                <span>Fəaliyyət</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-bottom">
-            <a href="#" id="logoutBtn">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Çıxış</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="top-bar-left">
-                <h1 id="pageTitle">İdarə Paneli</h1>
-                <span class="breadcrumb">/ <span id="breadcrumbSub">Ümumi baxış</span></span>
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1><i class="fas fa-clipboard-check"></i> NaviMax QA Checklist</h1>
+                <div class="subtitle">Supabase ilə canlı test case idarəsi</div>
             </div>
-            <div class="top-bar-right">
+            <div class="header-actions">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Axtar..." id="globalSearch" />
+                    <input type="text" id="searchInput" placeholder="Axtar..." />
                 </div>
-                <button class="top-btn" id="notifBtn">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge" style="background:var(--accent-red);color:#fff;padding:2px 6px;font-size:10px;border-radius:50%;">3</span>
+                <button class="btn btn-primary" id="addBtn">
+                    <i class="fas fa-plus"></i> Yeni Test
                 </button>
-                <button class="top-btn primary" id="newTestCaseBtn">
-                    <i class="fas fa-plus"></i>
-                    Yeni Test Case
-                </button>
-                <div class="avatar-btn" id="userAvatar">R</div>
-            </div>
-        </div>
-
-        <!-- Dashboard Content -->
-        <div id="dashboardPage">
-
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue"><i class="fas fa-clipboard-list"></i></div>
-                    <div class="stat-value" id="totalTests">0</div>
-                    <div class="stat-label">Ümumi Test Case</div>
-                    <span class="stat-change up"><i class="fas fa-arrow-up"></i> 12%</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
-                    <div class="stat-value" id="passedTests">0</div>
-                    <div class="stat-label">Keçdi</div>
-                    <span class="stat-change up"><i class="fas fa-arrow-up"></i> 8%</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon red"><i class="fas fa-times-circle"></i></div>
-                    <div class="stat-value" id="failedTests">0</div>
-                    <div class="stat-label">Uğursuz</div>
-                    <span class="stat-change down"><i class="fas fa-arrow-down"></i> 3%</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon yellow"><i class="fas fa-ban"></i></div>
-                    <div class="stat-value" id="blockedTests">0</div>
-                    <div class="stat-label">Bloklanıb</div>
-                    <span class="stat-change">-</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon purple"><i class="fas fa-sync-alt"></i></div>
-                    <div class="stat-value" id="retestTests">0</div>
-                    <div class="stat-label">Retest</div>
-                    <span class="stat-change up"><i class="fas fa-arrow-up"></i> 5%</span>
-                </div>
-            </div>
-
-            <!-- Charts -->
-            <div class="dashboard-grid">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Test Case Statistikası</h3>
-                        <div class="card-actions">
-                            <button class="active" data-chart="bar">Bar</button>
-                            <button data-chart="pie">Pie</button>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="mainChart"></canvas>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Bölmə Statistikası</h3>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="sectionChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Test Cases -->
-            <div class="test-cases-section">
-                <div class="test-cases-header">
-                    <h2>Son Test Case-lər</h2>
-                    <div class="filters">
-                        <select class="filter-select" id="filterStatus">
-                            <option value="all">Bütün Statuslar</option>
-                            <option value="passed">Keçdi</option>
-                            <option value="failed">Uğursuz</option>
-                            <option value="blocked">Bloklanıb</option>
-                            <option value="retest">Retest</option>
-                            <option value="not-tested">Test edilməyib</option>
-                        </select>
-                        <select class="filter-select" id="filterPriority">
-                            <option value="all">Bütün Prioritetlər</option>
-                            <option value="critical">Critical</option>
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
-                        </select>
-                        <select class="filter-select" id="sortBy">
-                            <option value="newest">Ən Yeni</option>
-                            <option value="oldest">Ən Köhnə</option>
-                            <option value="priority">Prioritet</option>
-                            <option value="alphabetical">Əlifba sırası</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width:40px;"><i class="fas fa-check"></i></th>
-                                <th>TC ID <i class="fas fa-sort"></i></th>
-                                <th>Başlıq</th>
-                                <th>Bölmə</th>
-                                <th>Status</th>
-                                <th>Prioritet</th>
-                                <th style="text-align:right;">Əməliyyatlar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="testCasesBody">
-                            <!-- Dynamic rows -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Hidden pages -->
-        <div id="projectsPage" style="display:none;">
-            <div class="empty-state">
-                <i class="fas fa-folder-open"></i>
-                <h3>Layihələr</h3>
-                <p>Burada layihələrinizi idarə edə bilərsiniz.</p>
-                <button class="top-btn primary" style="margin-top:16px;display:inline-flex;">
-                    <i class="fas fa-plus"></i> Yeni Layihə
+                <button class="btn" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
                 </button>
             </div>
         </div>
 
-        <div id="sectionsPage" style="display:none;">
-            <div class="empty-state">
-                <i class="fas fa-layer-group"></i>
-                <h3>Bölmələr</h3>
-                <p>Test case-lərinizi bölmələrə ayırın.</p>
-                <button class="top-btn primary" style="margin-top:16px;display:inline-flex;">
-                    <i class="fas fa-plus"></i> Yeni Bölmə
-                </button>
-            </div>
+        <!-- Stats -->
+        <div class="stats" id="stats">
+            <div class="stat-box"><div class="num blue" id="total">0</div><div class="label">📋 Ümumi</div></div>
+            <div class="stat-box"><div class="num green" id="passed">0</div><div class="label">✅ Keçdi</div></div>
+            <div class="stat-box"><div class="num red" id="failed">0</div><div class="label">❌ Uğursuz</div></div>
+            <div class="stat-box"><div class="num yellow" id="blocked">0</div><div class="label">🚫 Bloklanıb</div></div>
+            <div class="stat-box"><div class="num purple" id="retest">0</div><div class="label">🔄 Retest</div></div>
+            <div class="stat-box"><div class="num" id="notTested" style="color:#6a6a82;">0</div><div class="label">⏳ Edilməyib</div></div>
         </div>
 
-        <div id="reportsPage" style="display:none;">
-            <div class="empty-state">
-                <i class="fas fa-file-alt"></i>
-                <h3>Hesabatlar</h3>
-                <p>Test nəticələrinizi PDF, Excel və ya CSV olaraq ixrac edin.</p>
-                <div style="display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
-                    <button class="top-btn"><i class="fas fa-file-pdf"></i> PDF</button>
-                    <button class="top-btn"><i class="fas fa-file-excel"></i> Excel</button>
-                    <button class="top-btn"><i class="fas fa-file-csv"></i> CSV</button>
-                    <button class="top-btn"><i class="fas fa-file-code"></i> JSON</button>
-                </div>
-            </div>
+        <!-- Table -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:40px;"></th>
+                        <th style="width:70px;">ID</th>
+                        <th>Test Case</th>
+                        <th style="width:140px;">Status</th>
+                        <th style="width:120px;">Prioritet</th>
+                        <th style="width:100px;">Bug ID</th>
+                        <th style="width:50px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="7">
+                            <div class="loading">
+                                <i class="fas fa-spinner"></i>
+                                <p>Məlumatlar yüklənir...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <div id="activityPage" style="display:none;">
-            <div class="empty-state">
-                <i class="fas fa-history"></i>
-                <h3>Fəaliyyət Jurnalı</h3>
-                <p>Bütün dəyişikliklər burada qeyd olunur.</p>
-            </div>
-        </div>
-
-    </main>
+    </div>
 
     <!-- Modal -->
-    <div class="modal-overlay" id="testCaseModal">
+    <div class="modal-overlay" id="modal">
         <div class="modal">
             <div class="modal-header">
                 <h2 id="modalTitle">Yeni Test Case</h2>
                 <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
             </div>
-            <form id="testCaseForm">
+            <form id="modalForm">
                 <input type="hidden" id="editId" />
                 <div class="form-group">
                     <label>Başlıq *</label>
-                    <input type="text" id="tcTitle" placeholder="Test case başlığını daxil edin" required />
+                    <input type="text" id="formTitle" placeholder="Test case başlığı" required />
                 </div>
                 <div class="form-group">
                     <label>Təsvir</label>
-                    <textarea id="tcDescription" placeholder="Test case təsviri"></textarea>
+                    <textarea id="formDesc" placeholder="Qısa təsvir" rows="2"></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Status</label>
-                        <select id="tcStatus">
-                            <option value="not-tested">Test edilməyib</option>
-                            <option value="passed">Keçdi</option>
-                            <option value="failed">Uğursuz</option>
-                            <option value="blocked">Bloklanıb</option>
-                            <option value="retest">Retest</option>
+                        <select id="formStatus">
+                            <option value="not-tested">⏳ Test edilməyib</option>
+                            <option value="passed">✅ Keçdi</option>
+                            <option value="failed">❌ Uğursuz</option>
+                            <option value="blocked">🚫 Bloklanıb</option>
+                            <option value="retest">🔄 Retest</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Prioritet</label>
-                        <select id="tcPriority">
-                            <option value="critical">Critical</option>
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
+                        <select id="formPriority">
+                            <option value="critical">🔴 Critical</option>
+                            <option value="high">🟠 High</option>
+                            <option value="medium" selected>🔵 Medium</option>
+                            <option value="low">⚪ Low</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Gözlənilən Nəticə</label>
-                        <input type="text" id="tcExpected" placeholder="Gözlənilən nəticə" />
-                    </div>
-                    <div class="form-group">
-                        <label>Faktiki Nəticə</label>
-                        <input type="text" id="tcActual" placeholder="Faktiki nəticə" />
-                    </div>
+                <div class="form-group">
+                    <label>Bug ID</label>
+                    <input type="text" id="formBug" placeholder="Məs: BUG-123" />
                 </div>
                 <div class="form-group">
-                    <label>Qeydlər</label>
-                    <textarea id="tcNotes" placeholder="Əlavə qeydlər"></textarea>
+                    <label>Bölmə</label>
+                    <select id="formSection">
+                        <option value="Login / Register">Login / Register</option>
+                        <option value="Ana səhifə">Ana səhifə</option>
+                        <option value="Xəritə">Xəritə</option>
+                        <option value="Obyektlər">Obyektlər</option>
+                        <option value="Tarixçə">Tarixçə</option>
+                        <option value="Maşın İzləmə">Maşın İzləmə</option>
+                        <option value="Bildirişlər">Bildirişlər</option>
+                        <option value="Kart">Kart</option>
+                        <option value="Balans">Balans</option>
+                        <option value="Logout">Logout</option>
+                        <option value="Digər">Digər</option>
+                    </select>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" id="modalCancel">Ləğv et</button>
-                    <button type="submit" class="btn-primary" id="modalSubmit">Yadda saxla</button>
+                    <button type="submit" class="btn-primary-modal" id="modalSubmit">Yadda saxla</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Toast Container -->
+    <!-- Toast -->
     <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Dark Mode Toggle -->
-    <button class="dark-mode-toggle" id="darkModeToggle">
-        <i class="fas fa-moon"></i>
-    </button>
 
     <script>
         // ============================================================
-        // DATA STORE
+        // SUPABASE KONFİQURASİYA
+        // ============================================================
+        const SUPABASE_URL = 'https://vqdzohcztqztnsqbptfm.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_vHOZFaQlWoJ1epmGcfB9lw_Zn2v27v2';
+
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================================
+        // STATE
         // ============================================================
         let testCases = [];
-        let currentEditId = null;
-        let currentPage = 'dashboard';
-        let darkMode = false;
+        let isLoading = false;
 
-        // Sample data
-        const sampleTestCases = [{
-            id: 'TC-001',
-            title: 'Login funksionallığının testi',
-            description: 'İstifadəçi email və şifrə ilə daxil ola bilməlidir',
-            status: 'passed',
-            priority: 'critical',
-            section: 'Login / Register',
-            expected: 'İstifadəçi uğurla daxil olur',
-            actual: 'İstifadəçi uğurla daxil oldu',
-            notes: 'Bütün brauzerlərdə test edilib',
-            createdAt: '2026-07-15T10:30:00'
-        }, {
-            id: 'TC-002',
-            title: 'Qeydiyyat formunun validasiyası',
-            description: 'Bütün sahələr doldurulmalıdır',
-            status: 'failed',
-            priority: 'high',
-            section: 'Login / Register',
-            expected: 'Xəta mesajı göstərilir',
-            actual: 'Xəta mesajı göstərilmədi',
-            notes: 'Bug #1234 - Backend tərəfdə düzəldilməlidir',
-            createdAt: '2026-07-15T11:00:00'
-        }, {
-            id: 'TC-003',
-            title: 'Xəritə yüklənməsi',
-            description: 'Ana səhifədə xəritə düzgün yüklənməlidir',
-            status: 'blocked',
-            priority: 'medium',
-            section: 'Xəritə',
-            expected: 'Xəritə 3 saniyə ərzində yüklənir',
-            actual: 'Xəritə yüklənmədi',
-            notes: 'API limiti aşılıb',
-            createdAt: '2026-07-14T09:15:00'
-        }, {
-            id: 'TC-004',
-            title: 'Obyekt axtarışı',
-            description: 'İstifadəçi obyektləri axtara bilməlidir',
-            status: 'retest',
-            priority: 'high',
-            section: 'Obyektlər',
-            expected: 'Axtarış nəticələri göstərilir',
-            actual: 'Nəticələr gec gəlir',
-            notes: 'Retest ediləcək',
-            createdAt: '2026-07-14T14:20:00'
-        }, {
-            id: 'TC-005',
-            title: 'Bildiriş sistemi',
-            description: 'Yeni bildirişlər avtomatik gəlməlidir',
-            status: 'not-tested',
-            priority: 'low',
-            section: 'Bildirişlər',
-            expected: 'Bildiriş real-time gəlir',
-            actual: '',
-            notes: 'Test edilməyib',
-            createdAt: '2026-07-13T08:00:00'
-        }, {
-            id: 'TC-006',
-            title: 'Kart səhifəsi yüklənməsi',
-            description: 'Kart səhifəsi düzgün yüklənməlidir',
-            status: 'passed',
-            priority: 'medium',
-            section: 'Kart',
-            expected: 'Bütün elementlər göstərilir',
-            actual: 'Bütün elementlər göstərildi',
-            notes: 'OK',
-            createdAt: '2026-07-13T16:45:00'
-        }, {
-            id: 'TC-007',
-            title: 'Balans göstəricisi',
-            description: 'Balans düzgün göstərilməlidir',
-            status: 'failed',
-            priority: 'critical',
-            section: 'Balans',
-            expected: 'Doğru balans göstərilir',
-            actual: 'Yanlış balans göstərilir',
-            notes: 'Bug #5678',
-            createdAt: '2026-07-12T10:00:00'
-        }, {
-            id: 'TC-008',
-            title: 'Maşın izləmə real-time',
-            description: 'Maşınlar real-time izlənilməlidir',
-            status: 'blocked',
-            priority: 'high',
-            section: 'Maşın İzləmə',
-            expected: 'Maşın hər 5 saniyədə yenilənir',
-            actual: 'Yenilənmə yoxdur',
-            notes: 'WebSocket problemi',
-            createdAt: '2026-07-12T13:30:00'
-        }];
+        // ============================================================
+        // CRUD FUNCTIONS
+        // ============================================================
 
-        // Initialize data
-        function initData() {
-            const saved = localStorage.getItem('testCases');
-            if (saved) {
-                testCases = JSON.parse(saved);
-            } else {
-                testCases = sampleTestCases;
-                saveData();
+        // Load all test cases
+        async function loadTestCases() {
+            if (isLoading) return;
+            isLoading = true;
+            document.getElementById('tableBody').innerHTML = `
+                    <tr><td colspan="7">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>Məlumatlar yüklənir...</p>
+                        </div>
+                    </td></tr>
+                `;
+
+            try {
+                const { data, error } = await supabase
+                    .from('qa_test_cases')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                testCases = data || [];
+                render();
+                showToast('Uğurlu', `${testCases.length} test case yükləndi`, 'success');
+            } catch (error) {
+                console.error('Load error:', error);
+                showToast('Xəta', 'Məlumatlar yüklənərkən xəta baş verdi', 'error');
+                document.getElementById('tableBody').innerHTML = `
+                        <tr><td colspan="7">
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Xəta baş verdi</h3>
+                                <p>${error.message}</p>
+                            </div>
+                        </td></tr>
+                    `;
+            } finally {
+                isLoading = false;
             }
-            renderStats();
-            renderTable();
-            renderCharts();
         }
 
-        function saveData() {
-            localStorage.setItem('testCases', JSON.stringify(testCases));
+        // Add new test case
+        async function addTestCase(data) {
+            try {
+                // Generate TC ID
+                const maxNum = testCases.reduce((max, t) => {
+                    const num = parseInt(t.tc_id.replace('TC-', ''));
+                    return num > max ? num : max;
+                }, 0);
+                const tcId = `TC-${String(maxNum + 1).padStart(3, '0')}`;
+
+                const { data: inserted, error } = await supabase
+                    .from('qa_test_cases')
+                    .insert([{
+                        tc_id: tcId,
+                        title: data.title,
+                        description: data.description || '',
+                        status: data.status || 'not-tested',
+                        priority: data.priority || 'medium',
+                        bug_id: data.bug || null,
+                        section: data.section || 'Digər'
+                    }])
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                testCases.unshift(inserted);
+                render();
+                showToast('Uğurlu', `"${data.title}" əlavə edildi`, 'success');
+                return inserted;
+            } catch (error) {
+                console.error('Add error:', error);
+                showToast('Xəta', 'Əlavə edərkən xəta baş verdi', 'error');
+                throw error;
+            }
+        }
+
+        // Update test case
+        async function updateTestCase(id, updates) {
+            try {
+                const { data, error } = await supabase
+                    .from('qa_test_cases')
+                    .update(updates)
+                    .eq('id', id)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                const index = testCases.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    testCases[index] = data;
+                }
+                render();
+                showToast('Uğurlu', 'Test case yeniləndi', 'success');
+                return data;
+            } catch (error) {
+                console.error('Update error:', error);
+                showToast('Xəta', 'Yeniləyərkən xəta baş verdi', 'error');
+                throw error;
+            }
+        }
+
+        // Delete test case
+        async function deleteTestCase(id) {
+            if (!confirm('Bu test case-i silmək istədiyinizə əminsiniz?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('qa_test_cases')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                testCases = testCases.filter(t => t.id !== id);
+                render();
+                showToast('Uğurlu', 'Test case silindi', 'info');
+            } catch (error) {
+                console.error('Delete error:', error);
+                showToast('Xəta', 'Silərkən xəta baş verdi', 'error');
+            }
+        }
+
+        // Toggle status via checkbox
+        async function toggleStatus(id) {
+            const tc = testCases.find(t => t.id === id);
+            if (!tc) return;
+
+            const newStatus = tc.status === 'passed' ? 'not-tested' : 'passed';
+            await updateTestCase(id, { status: newStatus });
+        }
+
+        // Update status from dropdown
+        async function updateStatus(id, value) {
+            await updateTestCase(id, { status: value });
+        }
+
+        // Update priority from dropdown
+        async function updatePriority(id, value) {
+            await updateTestCase(id, { priority: value });
+        }
+
+        // Update bug ID
+        async function updateBug(id, value) {
+            await updateTestCase(id, { bug_id: value || null });
         }
 
         // ============================================================
-        // RENDER FUNCTIONS
+        // RENDER
         // ============================================================
-        function renderStats() {
+        function render() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const tbody = document.getElementById('tableBody');
+
+            let filtered = testCases.filter(tc =>
+                tc.title.toLowerCase().includes(search) ||
+                tc.tc_id.toLowerCase().includes(search) ||
+                (tc.bug_id && tc.bug_id.toLowerCase().includes(search))
+            );
+
+            // Stats
             const total = testCases.length;
             const passed = testCases.filter(t => t.status === 'passed').length;
             const failed = testCases.filter(t => t.status === 'failed').length;
@@ -1553,342 +962,77 @@
             const retest = testCases.filter(t => t.status === 'retest').length;
             const notTested = testCases.filter(t => t.status === 'not-tested').length;
 
-            document.getElementById('totalTests').textContent = total;
-            document.getElementById('passedTests').textContent = passed;
-            document.getElementById('failedTests').textContent = failed;
-            document.getElementById('blockedTests').textContent = blocked;
-            document.getElementById('retestTests').textContent = retest;
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('testCasesBody');
-            const statusFilter = document.getElementById('filterStatus').value;
-            const priorityFilter = document.getElementById('filterPriority').value;
-            const sortBy = document.getElementById('sortBy').value;
-            const searchTerm = document.getElementById('globalSearch').value.toLowerCase();
-
-            let filtered = testCases.filter(tc => {
-                const matchStatus = statusFilter === 'all' || tc.status === statusFilter;
-                const matchPriority = priorityFilter === 'all' || tc.priority === priorityFilter;
-                const matchSearch = tc.title.toLowerCase().includes(searchTerm) ||
-                    tc.id.toLowerCase().includes(searchTerm) ||
-                    tc.description.toLowerCase().includes(searchTerm) ||
-                    tc.notes.toLowerCase().includes(searchTerm);
-                return matchStatus && matchPriority && matchSearch;
-            });
-
-            // Sort
-            switch (sortBy) {
-                case 'newest':
-                    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    break;
-                case 'oldest':
-                    filtered.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                    break;
-                case 'priority': {
-                    const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-                    filtered.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
-                    break;
-                }
-                case 'alphabetical':
-                    filtered.sort((a, b) => a.title.localeCompare(b.title));
-                    break;
-            }
+            document.getElementById('total').textContent = total;
+            document.getElementById('passed').textContent = passed;
+            document.getElementById('failed').textContent = failed;
+            document.getElementById('blocked').textContent = blocked;
+            document.getElementById('retest').textContent = retest;
+            document.getElementById('notTested').textContent = notTested;
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">
-                            <i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:8px;"></i>
-                            Heç bir test case tapılmadı
-                        </td>
-                    </tr>
-                `;
+                        <tr><td colspan="7">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <h3>Heç bir test case tapılmadı</h3>
+                                <p>Yeni test case əlavə etmək üçün "Yeni Test" düyməsinə klikləyin</p>
+                            </div>
+                        </td></tr>
+                    `;
                 return;
             }
 
             tbody.innerHTML = filtered.map(tc => `
-                <tr>
-                    <td>
-                        <label class="custom-checkbox">
-                            <input type="checkbox" ${tc.status === 'passed' ? 'checked' : ''} onchange="toggleCheck('${tc.id}')" />
-                            <span class="checkmark"><i class="fas fa-check"></i></span>
-                        </label>
-                    </td>
-                    <td><span class="tc-id">${tc.id}</span></td>
-                    <td>
-                        <div class="tc-title">
-                            ${tc.title}
-                            <small>${tc.description || 'Təsvir yoxdur'}</small>
-                        </div>
-                    </td>
-                    <td>${tc.section || '—'}</td>
-                    <td><span class="badge status-${tc.status}">${getStatusLabel(tc.status)}</span></td>
-                    <td><span class="badge priority-${tc.priority}">${getPriorityLabel(tc.priority)}</span></td>
-                    <td style="text-align:right;">
-                        <div class="td-actions" style="justify-content:flex-end;">
-                            <button onclick="editTestCase('${tc.id}')" title="Redaktə et"><i class="fas fa-edit"></i></button>
-                            <button onclick="duplicateTestCase('${tc.id}')" title="Dublikat"><i class="fas fa-copy"></i></button>
-                            <button class="delete" onclick="deleteTestCase('${tc.id}')" title="Sil"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function getStatusLabel(status) {
-            const labels = {
-                'passed': 'Keçdi',
-                'failed': 'Uğursuz',
-                'blocked': 'Bloklanıb',
-                'retest': 'Retest',
-                'not-tested': 'Test edilməyib'
-            };
-            return labels[status] || status;
-        }
-
-        function getPriorityLabel(priority) {
-            const labels = {
-                'critical': 'Critical',
-                'high': 'High',
-                'medium': 'Medium',
-                'low': 'Low'
-            };
-            return labels[priority] || priority;
-        }
-
-        function renderCharts() {
-            // Main Chart - Bar
-            const ctx1 = document.getElementById('mainChart').getContext('2d');
-            const statusCounts = {
-                'passed': testCases.filter(t => t.status === 'passed').length,
-                'failed': testCases.filter(t => t.status === 'failed').length,
-                'blocked': testCases.filter(t => t.status === 'blocked').length,
-                'retest': testCases.filter(t => t.status === 'retest').length,
-                'not-tested': testCases.filter(t => t.status === 'not-tested').length
-            };
-
-            new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: ['Keçdi', 'Uğursuz', 'Bloklanıb', 'Retest', 'Test edilməyib'],
-                    datasets: [{
-                        label: 'Test Case sayı',
-                        data: [
-                            statusCounts.passed,
-                            statusCounts.failed,
-                            statusCounts.blocked,
-                            statusCounts.retest,
-                            statusCounts['not-tested']
-                        ],
-                        backgroundColor: [
-                            '#10b981',
-                            '#ef4444',
-                            '#f59e0b',
-                            '#7c3aed',
-                            '#6a6a82'
-                        ],
-                        borderRadius: 8,
-                        borderSkipped: false,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255,255,255,0.05)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                color: '#6a6a82',
-                                stepSize: 1
-                            }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                color: '#6a6a82',
-                                font: { size: 11 }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Section Chart - Doughnut
-            const ctx2 = document.getElementById('sectionChart').getContext('2d');
-            const sectionCounts = {};
-            testCases.forEach(tc => {
-                const section = tc.section || 'Digər';
-                sectionCounts[section] = (sectionCounts[section] || 0) + 1;
-            });
-
-            const sectionColors = [
-                '#4f8cf7', '#7c3aed', '#10b981', '#f59e0b', '#ef4444',
-                '#ec4899', '#8b5cf6', '#06b6d4'
-            ];
-
-            new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(sectionCounts),
-                    datasets: [{
-                        data: Object.values(sectionCounts),
-                        backgroundColor: sectionColors.slice(0, Object.keys(sectionCounts).length),
-                        borderColor: '#12121a',
-                        borderWidth: 3,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#a0a0b8',
-                                padding: 12,
-                                font: { size: 11 },
-                                usePointStyle: true,
-                                pointStyle: 'circle'
-                            }
-                        }
-                    },
-                    cutout: '65%'
-                }
-            });
+                    <tr>
+                        <td>
+                            <label class="checkbox-custom">
+                                <input type="checkbox" ${tc.status === 'passed' ? 'checked' : ''} 
+                                       onchange="toggleStatus('${tc.id}')" />
+                                <span class="checkmark"><i class="fas fa-check"></i></span>
+                            </label>
+                        </td>
+                        <td><span class="tc-id">${tc.tc_id}</span></td>
+                        <td>
+                            <div class="tc-title">
+                                ${tc.title}
+                                <small>${tc.description || 'Təsvir yoxdur'}</small>
+                                ${tc.section ? `<small><i class="fas fa-folder"></i> ${tc.section}</small>` : ''}
+                            </div>
+                        </td>
+                        <td>
+                            <select class="td-select" onchange="updateStatus('${tc.id}', this.value)">
+                                <option value="not-tested" ${tc.status === 'not-tested' ? 'selected' : ''}>⏳ Edilməyib</option>
+                                <option value="passed" ${tc.status === 'passed' ? 'selected' : ''}>✅ Keçdi</option>
+                                <option value="failed" ${tc.status === 'failed' ? 'selected' : ''}>❌ Uğursuz</option>
+                                <option value="blocked" ${tc.status === 'blocked' ? 'selected' : ''}>🚫 Bloklanıb</option>
+                                <option value="retest" ${tc.status === 'retest' ? 'selected' : ''}>🔄 Retest</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="td-select td-select-priority ${tc.priority}" 
+                                    onchange="updatePriority('${tc.id}', this.value)">
+                                <option value="critical" ${tc.priority === 'critical' ? 'selected' : ''}>🔴 Critical</option>
+                                <option value="high" ${tc.priority === 'high' ? 'selected' : ''}>🟠 High</option>
+                                <option value="medium" ${tc.priority === 'medium' ? 'selected' : ''}>🔵 Medium</option>
+                                <option value="low" ${tc.priority === 'low' ? 'selected' : ''}>⚪ Low</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input class="bug-input" type="text" placeholder="BUG-ID" 
+                                   value="${tc.bug_id || ''}" 
+                                   onchange="updateBug('${tc.id}', this.value)" />
+                        </td>
+                        <td>
+                            <button class="btn-delete" onclick="deleteTestCase('${tc.id}')" title="Sil">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
         }
 
         // ============================================================
-        // CRUD OPERATIONS
-        // ============================================================
-        function generateId() {
-            const existing = testCases.map(t => parseInt(t.id.replace('TC-', '')));
-            const max = existing.length > 0 ? Math.max(...existing) : 0;
-            return `TC-${String(max + 1).padStart(3, '0')}`;
-        }
-
-        function openModal(data = null) {
-            const modal = document.getElementById('testCaseModal');
-            const form = document.getElementById('testCaseForm');
-            form.reset();
-
-            if (data) {
-                document.getElementById('modalTitle').textContent = 'Test Case Redaktə et';
-                document.getElementById('editId').value = data.id;
-                document.getElementById('tcTitle').value = data.title;
-                document.getElementById('tcDescription').value = data.description || '';
-                document.getElementById('tcStatus').value = data.status;
-                document.getElementById('tcPriority').value = data.priority;
-                document.getElementById('tcExpected').value = data.expected || '';
-                document.getElementById('tcActual').value = data.actual || '';
-                document.getElementById('tcNotes').value = data.notes || '';
-                document.getElementById('modalSubmit').textContent = 'Yenilə';
-            } else {
-                document.getElementById('modalTitle').textContent = 'Yeni Test Case';
-                document.getElementById('editId').value = '';
-                document.getElementById('modalSubmit').textContent = 'Yarat';
-            }
-
-            modal.classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('testCaseModal').classList.remove('active');
-        }
-
-        function handleSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('editId').value;
-            const data = {
-                title: document.getElementById('tcTitle').value,
-                description: document.getElementById('tcDescription').value,
-                status: document.getElementById('tcStatus').value,
-                priority: document.getElementById('tcPriority').value,
-                expected: document.getElementById('tcExpected').value,
-                actual: document.getElementById('tcActual').value,
-                notes: document.getElementById('tcNotes').value,
-            };
-
-            if (id) {
-                // Edit
-                const index = testCases.findIndex(t => t.id === id);
-                if (index !== -1) {
-                    testCases[index] = { ...testCases[index], ...data };
-                    showToast('Uğurlu', 'Test case yeniləndi', 'success');
-                }
-            } else {
-                // Create
-                const newTC = {
-                    id: generateId(),
-                    ...data,
-                    section: 'Digər',
-                    createdAt: new Date().toISOString()
-                };
-                testCases.unshift(newTC);
-                showToast('Uğurlu', 'Yeni test case yaradıldı', 'success');
-            }
-
-            saveData();
-            renderStats();
-            renderTable();
-            renderCharts();
-            closeModal();
-        }
-
-        function editTestCase(id) {
-            const tc = testCases.find(t => t.id === id);
-            if (tc) openModal(tc);
-        }
-
-        function deleteTestCase(id) {
-            if (confirm('Bu test case-i silmək istədiyinizə əminsiniz?')) {
-                testCases = testCases.filter(t => t.id !== id);
-                saveData();
-                renderStats();
-                renderTable();
-                renderCharts();
-                showToast('Uğurlu', 'Test case silindi', 'info');
-            }
-        }
-
-        function duplicateTestCase(id) {
-            const original = testCases.find(t => t.id === id);
-            if (original) {
-                const newTC = {
-                    ...original,
-                    id: generateId(),
-                    title: original.title + ' (kopya)',
-                    createdAt: new Date().toISOString()
-                };
-                testCases.unshift(newTC);
-                saveData();
-                renderStats();
-                renderTable();
-                renderCharts();
-                showToast('Uğurlu', 'Test case dublikatı yaradıldı', 'success');
-            }
-        }
-
-        function toggleCheck(id) {
-            const tc = testCases.find(t => t.id === id);
-            if (tc) {
-                tc.status = tc.status === 'passed' ? 'not-tested' : 'passed';
-                saveData();
-                renderStats();
-                renderTable();
-                renderCharts();
-            }
-        }
-
-        // ============================================================
-        // TOAST SYSTEM
+        // TOAST
         // ============================================================
         function showToast(title, message, type = 'info') {
             const container = document.getElementById('toastContainer');
@@ -1901,16 +1045,18 @@
 
             toast.className = `toast ${type}`;
             toast.innerHTML = `
-                <i class="fas ${icons[type] || icons.info}"></i>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <button class="toast-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
-            `;
+                    <i class="fas ${icons[type] || icons.info}"></i>
+                    <div>
+                        <div style="font-weight:600;font-size:14px;">${title}</div>
+                        <div style="font-size:13px;color:#6a6a82;">${message}</div>
+                    </div>
+                    <button style="background:transparent;border:none;color:#6a6a82;cursor:pointer;font-size:16px;" 
+                            onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
 
             container.appendChild(toast);
-
             setTimeout(() => {
                 toast.classList.add('hide');
                 setTimeout(() => toast.remove(), 300);
@@ -1918,149 +1064,109 @@
         }
 
         // ============================================================
-        // NAVIGATION
+        // MODAL
         // ============================================================
-        function navigateTo(page) {
-            const pages = ['dashboard', 'projects', 'test-cases', 'sections', 'reports', 'activity'];
-            pages.forEach(p => {
-                document.getElementById(p + 'Page').style.display = p === page ? 'block' : 'none';
-            });
+        function openModal(data = null) {
+            const modal = document.getElementById('modal');
+            document.getElementById('editId').value = data ? data.id : '';
+            document.getElementById('formTitle').value = data ? data.title : '';
+            document.getElementById('formDesc').value = data ? data.description : '';
+            document.getElementById('formStatus').value = data ? data.status : 'not-tested';
+            document.getElementById('formPriority').value = data ? data.priority : 'medium';
+            document.getElementById('formBug').value = data ? data.bug_id : '';
+            document.getElementById('formSection').value = data ? data.section : 'Digər';
 
-            document.querySelectorAll('.sidebar-nav a').forEach(a => {
-                a.classList.toggle('active', a.dataset.page === page);
-            });
-
-            currentPage = page;
-            const titles = {
-                'dashboard': 'İdarə Paneli',
-                'projects': 'Layihələr',
-                'test-cases': 'Test Case-lər',
-                'sections': 'Bölmələr',
-                'reports': 'Hesabatlar',
-                'activity': 'Fəaliyyət'
-            };
-            document.getElementById('pageTitle').textContent = titles[page] || 'Səhifə';
-            document.getElementById('breadcrumbSub').textContent = titles[page] || '';
+            document.getElementById('modalTitle').textContent = data ? 'Test Case Redaktə et' : 'Yeni Test Case';
+            document.getElementById('modalSubmit').textContent = data ? 'Yenilə' : 'Yarat';
+            modal.classList.add('active');
         }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.getElementById('addBtn').addEventListener('click', () => openModal());
+        document.getElementById('modalClose').addEventListener('click', closeModal);
+        document.getElementById('modalCancel').addEventListener('click', closeModal);
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        document.getElementById('modalForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const data = {
+                title: document.getElementById('formTitle').value.trim(),
+                description: document.getElementById('formDesc').value.trim(),
+                status: document.getElementById('formStatus').value,
+                priority: document.getElementById('formPriority').value,
+                bug: document.getElementById('formBug').value.trim(),
+                section: document.getElementById('formSection').value
+            };
+
+            if (!data.title) {
+                showToast('Xəta', 'Başlıq daxil edin!', 'error');
+                return;
+            }
+
+            try {
+                if (id) {
+                    // Edit
+                    await updateTestCase(id, {
+                        title: data.title,
+                        description: data.description,
+                        status: data.status,
+                        priority: data.priority,
+                        bug_id: data.bug || null,
+                        section: data.section
+                    });
+                } else {
+                    // Create
+                    await addTestCase(data);
+                }
+                closeModal();
+            } catch (error) {
+                // Error already handled in functions
+            }
+        });
 
         // ============================================================
         // SEARCH
         // ============================================================
-        let searchTimeout;
-
-        document.getElementById('globalSearch').addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                if (currentPage === 'dashboard' || currentPage === 'test-cases') {
-                    renderTable();
-                }
-            }, 300);
-        });
+        document.getElementById('searchInput').addEventListener('input', render);
 
         // ============================================================
-        // FILTERS & SORT
+        // REFRESH
         // ============================================================
-        document.getElementById('filterStatus').addEventListener('change', renderTable);
-        document.getElementById('filterPriority').addEventListener('change', renderTable);
-        document.getElementById('sortBy').addEventListener('change', renderTable);
-
-        // ============================================================
-        // EVENTS
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            initData();
-
-            // Navigation
-            document.querySelectorAll('.sidebar-nav a').forEach(a => {
-                a.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    navigateTo(this.dataset.page);
-                });
-            });
-
-            // New Test Case
-            document.getElementById('newTestCaseBtn').addEventListener('click', () => openModal());
-
-            // Modal
-            document.getElementById('modalClose').addEventListener('click', closeModal);
-            document.getElementById('modalCancel').addEventListener('click', closeModal);
-            document.getElementById('testCaseForm').addEventListener('submit', handleSubmit);
-
-            // Close modal on overlay click
-            document.getElementById('testCaseModal').addEventListener('click', function(e) {
-                if (e.target === this) closeModal();
-            });
-
-            // Dark Mode
-            document.getElementById('darkModeToggle').addEventListener('click', function() {
-                darkMode = !darkMode;
-                const root = document.documentElement;
-                if (darkMode) {
-                    root.style.setProperty('--bg-primary', '#ffffff');
-                    root.style.setProperty('--bg-secondary', '#f8f8fc');
-                    root.style.setProperty('--bg-card', '#f0f0f5');
-                    root.style.setProperty('--bg-card-hover', '#e8e8ee');
-                    root.style.setProperty('--border-color', '#d0d0d8');
-                    root.style.setProperty('--text-primary', '#1a1a2e');
-                    root.style.setProperty('--text-secondary', '#4a4a62');
-                    root.style.setProperty('--text-muted', '#8a8aa2');
-                    this.innerHTML = '<i class="fas fa-sun"></i>';
-                } else {
-                    root.style.setProperty('--bg-primary', '#0a0a0f');
-                    root.style.setProperty('--bg-secondary', '#12121a');
-                    root.style.setProperty('--bg-card', '#1a1a2e');
-                    root.style.setProperty('--bg-card-hover', '#22223a');
-                    root.style.setProperty('--border-color', '#2a2a3e');
-                    root.style.setProperty('--text-primary', '#e8e8f0');
-                    root.style.setProperty('--text-secondary', '#a0a0b8');
-                    root.style.setProperty('--text-muted', '#6a6a82');
-                    this.innerHTML = '<i class="fas fa-moon"></i>';
-                }
-            });
-
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                if (confirm('Hesabdan çıxmaq istədiyinizə əminsiniz?')) {
-                    showToast('Uğurlu', 'Hesabdan çıxıldı', 'info');
-                    // In real app: clear session, redirect to login
-                }
-            });
-
-            // Notification
-            document.getElementById('notifBtn').addEventListener('click', function() {
-                showToast('Bildirişlər', '3 yeni bildiriş var', 'info');
-            });
-
-            // User avatar
-            document.getElementById('userAvatar').addEventListener('click', function() {
-                showToast('Profil', 'İstifadəçi profili', 'info');
-            });
-        });
+        document.getElementById('refreshBtn').addEventListener('click', loadTestCases);
 
         // ============================================================
         // KEYBOARD SHORTCUTS
         // ============================================================
-        document.addEventListener('keydown', function(e) {
-            // Ctrl+N - New Test Case
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
             if (e.ctrlKey && e.key === 'n') {
                 e.preventDefault();
                 openModal();
             }
-            // Escape - Close modal
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-            // Ctrl+F - Focus search
             if (e.ctrlKey && e.key === 'f') {
                 e.preventDefault();
-                document.getElementById('globalSearch').focus();
+                document.getElementById('searchInput').focus();
+            }
+            if (e.ctrlKey && e.key === 'r') {
+                e.preventDefault();
+                loadTestCases();
             }
         });
 
-        console.log('🚀 Manual QA Test Management System yükləndi!');
-        console.log('📊 Test Case sayı:', testCases.length);
-        console.log('⌨️ Qısayollar: Ctrl+N (Yeni), Ctrl+F (Axtar), ESC (Bağla)');
+        // ============================================================
+        // START
+        // ============================================================
+        loadTestCases();
+
+        console.log('✅ NaviMax QA Checklist - Supabase versiya yükləndi!');
+        console.log('🔗 Supabase URL:', SUPABASE_URL);
+        console.log('⌨️ Qısayollar: Ctrl+N (Yeni), Ctrl+F (Axtar), Ctrl+R (Yenilə), ESC (Bağla)');
     </script>
 
 </body>
