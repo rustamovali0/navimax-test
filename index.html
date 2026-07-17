@@ -911,7 +911,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 const { data, error } = await supabaseClient
     .from(TABLE_NAME)
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('tc_id', { ascending: true });
 
                 if (error) {
                     console.error('❌ Supabase xətası:', error);
