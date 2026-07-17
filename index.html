@@ -1043,10 +1043,12 @@ const { data, error } = await supabaseClient
                 render();
 Swal.close();
 
-Toast.fire({
-    icon: "success",
-    title: "Yadda saxlanıldı"
-});                return data;
+if (showMessage) {
+    Toast.fire({
+        icon: "success",
+        title: "Yadda saxlanıldı"
+    });
+}              return data;
 
             } catch (error) {
                 console.error('❌ Yeniləmə xətası:', error);
@@ -1108,7 +1110,7 @@ Swal.fire({
             const tc = testCases.find(t => t.tc_id === id);
             if (!tc) return;
             const newStatus = tc.status === 'passed' ? 'not-tested' : 'passed';
-            await updateTestCase(id, { status: newStatus });
+            await updateTestCase(id, { status: newStatus }, false);
         }
 
         async function updateStatus(id, value) {
@@ -1120,7 +1122,6 @@ Swal.fire({
         }
 
         async function updateBug(id, value) {
-async function updateBug(id, value) {
     await updateTestCase(id, { bug_id: value || null }, false);
 }        }
 
