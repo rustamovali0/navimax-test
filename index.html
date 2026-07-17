@@ -30,7 +30,6 @@
             margin: 0 auto;
         }
 
-        /* Header - Ağ */
         .header {
             display: flex;
             justify-content: space-between;
@@ -148,7 +147,6 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(79, 140, 247, 0.3);
-            background: linear-gradient(135deg, #3b7de0, #6d2fd6);
         }
         .btn-success {
             background: #10b981;
@@ -159,7 +157,6 @@
             background: #059669;
         }
 
-        /* Stats - Ağ */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -199,7 +196,6 @@
             color: #4f8cf7;
         }
 
-        /* Category Filter - Ağ */
         .category-filter {
             display: flex;
             gap: 8px;
@@ -252,7 +248,6 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        /* Table - Ağ */
         .table-wrap {
             background: #ffffff;
             border: 1px solid #e2e8f0;
@@ -293,7 +288,6 @@
             vertical-align: middle;
         }
 
-        /* Custom Checkbox - Ağ */
         .checkbox-custom {
             display: flex;
             align-items: center;
@@ -357,52 +351,6 @@
             display: inline-block;
             border: 1px solid #e2e8f0;
             margin-top: 4px;
-        }
-
-        /* Badges - Ağ */
-        .badge {
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .badge.passed {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-        .badge.failed {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-        .badge.blocked {
-            background: #fef3c7;
-            color: #d97706;
-        }
-        .badge.retest {
-            background: #ede9fe;
-            color: #7c3aed;
-        }
-        .badge.not-tested {
-            background: #f1f5f9;
-            color: #64748b;
-        }
-
-        .badge.critical {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-        .badge.high {
-            background: #fef3c7;
-            color: #d97706;
-        }
-        .badge.medium {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-        .badge.low {
-            background: #f1f5f9;
-            color: #64748b;
         }
 
         .td-select {
@@ -508,7 +456,6 @@
             }
         }
 
-        /* Toast - Ağ */
         .toast-container {
             position: fixed;
             bottom: 24px;
@@ -559,7 +506,6 @@
             }
         }
 
-        /* Modal - Ağ */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -900,13 +846,18 @@
 
     <script>
         // ============================================================
-        // SUPABASE KONFİQURASİYA
+        // SUPABASE KONFİQURASİYA - DÜZƏLİŞ EDİLDİ!
         // ============================================================
         const SUPABASE_URL = 'https://vqdzohcztqztnsqbptfm.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_vHOZFaQlWoJ1epmGcfB9lw_Zn2v27v2';
 
         const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('✅ Supabase client yaradıldı');
+
+        // ============================================================
+        // CƏDVƏL ADI - DÜZƏLİŞ EDİLDİ!
+        // ============================================================
+        const TABLE_NAME = 'qa_test_cases';
 
         // ============================================================
         // CATEGORIES
@@ -936,7 +887,7 @@
         function setStatus(type, text) {
             const el = document.getElementById('connectionStatus');
             const dot = el.querySelector('.dot');
-            const label = el.querySelector('#statusText');
+            const label = document.getElementById('statusText');
             el.className = `status-badge ${type}`;
             label.textContent = text;
         }
@@ -946,24 +897,36 @@
         // ============================================================
         async function loadTestCases() {
             document.getElementById('tableBody').innerHTML = `
-                    <tr><td colspan="7">
-                        <div class="loading">
-                            <i class="fas fa-spinner"></i>
-                            <p>Məlumatlar yüklənir...</p>
-                        </div>
-                    </td></tr>
-                `;
+                <tr><td colspan="7">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Məlumatlar yüklənir...</p>
+                    </div>
+                </td></tr>
+            `;
 
             try {
+                console.log(`📊 Cədvəldən oxunur: ${TABLE_NAME}`);
+                
                 const { data, error } = await supabase
-                    .from('qa_test_cases')
+                    .from(TABLE_NAME)
                     .select('*')
                     .order('created_at', { ascending: false });
 
                 if (error) {
-                    console.error('Supabase xətası:', error);
+                    console.error('❌ Supabase xətası:', error);
                     showToast('Xəta', 'Məlumatlar yüklənərkən xəta: ' + error.message, 'error');
                     setStatus('offline', '❌ Supabase əlçatmaz');
+                    document.getElementById('tableBody').innerHTML = `
+                        <tr><td colspan="7">
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Xəta baş verdi</h3>
+                                <p>${error.message}</p>
+                                <p style="font-size:12px;margin-top:8px;">Cədvəl adı: ${TABLE_NAME}</p>
+                            </div>
+                        </td></tr>
+                    `;
                     return;
                 }
 
@@ -973,12 +936,26 @@
                 setStatus('online', '✅ Supabase ilə sinxron');
                 renderCategories();
                 render();
-                showToast('Uğurlu', `${testCases.length} test case yükləndi`, 'success');
+                
+                if (testCases.length > 0) {
+                    showToast('Uğurlu', `${testCases.length} test case yükləndi`, 'success');
+                } else {
+                    showToast('Info', 'Cədvəl boşdur. Yeni test case əlavə edin!', 'info');
+                }
 
             } catch (error) {
-                console.error('Yükləmə xətası:', error);
+                console.error('❌ Yükləmə xətası:', error);
                 showToast('Xəta', 'Məlumatlar yüklənərkən xəta baş verdi', 'error');
                 setStatus('offline', '❌ Supabase əlçatmaz');
+                document.getElementById('tableBody').innerHTML = `
+                    <tr><td colspan="7">
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Xəta baş verdi</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    </td></tr>
+                `;
             }
         }
 
@@ -994,7 +971,7 @@
                 const tcId = `TC-${String(maxNum + 1).padStart(3, '0')}`;
 
                 const { data: inserted, error } = await supabase
-                    .from('qa_test_cases')
+                    .from(TABLE_NAME)
                     .insert([{
                         tc_id: tcId,
                         title: data.title,
@@ -1016,7 +993,7 @@
                 return inserted;
 
             } catch (error) {
-                console.error('Əlavə etmə xətası:', error);
+                console.error('❌ Əlavə etmə xətası:', error);
                 showToast('Xəta', 'Əlavə edərkən xəta baş verdi', 'error');
                 throw error;
             }
@@ -1025,7 +1002,7 @@
         async function updateTestCase(id, updates) {
             try {
                 const { data, error } = await supabase
-                    .from('qa_test_cases')
+                    .from(TABLE_NAME)
                     .update(updates)
                     .eq('tc_id', id)
                     .select()
@@ -1043,7 +1020,7 @@
                 return data;
 
             } catch (error) {
-                console.error('Yeniləmə xətası:', error);
+                console.error('❌ Yeniləmə xətası:', error);
                 showToast('Xəta', 'Yeniləyərkən xəta baş verdi', 'error');
                 throw error;
             }
@@ -1054,7 +1031,7 @@
 
             try {
                 const { error } = await supabase
-                    .from('qa_test_cases')
+                    .from(TABLE_NAME)
                     .delete()
                     .eq('tc_id', id);
 
@@ -1066,7 +1043,7 @@
                 showToast('Uğurlu', 'Test case silindi', 'success');
 
             } catch (error) {
-                console.error('Silinmə xətası:', error);
+                console.error('❌ Silinmə xətası:', error);
                 showToast('Xəta', 'Silərkən xəta baş verdi', 'error');
             }
         }
@@ -1158,7 +1135,6 @@
             document.getElementById('notTested').textContent = notTested;
             document.getElementById('dataCount').textContent = total;
 
-            // Update category counts
             document.querySelectorAll('.category-btn').forEach(btn => {
                 const cat = btn.dataset.category;
                 const count = cat === 'all' ? testCases.length : testCases.filter(t => t.category === cat).length;
@@ -1168,80 +1144,67 @@
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `
-                        <tr><td colspan="7">
-                            <div class="empty-state">
-                                <i class="fas fa-inbox"></i>
-                                <h3>Heç bir test case tapılmadı</h3>
-                                <p>Yeni test case əlavə etmək üçün "Yeni Test" düyməsinə klikləyin</p>
-                            </div>
-                        </td></tr>
-                    `;
+                    <tr><td colspan="7">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>Heç bir test case tapılmadı</h3>
+                            <p>Yeni test case əlavə etmək üçün "Yeni Test" düyməsinə klikləyin</p>
+                        </div>
+                    </td></tr>
+                `;
                 return;
             }
 
             tbody.innerHTML = filtered.map(tc => {
                 const cat = categories.find(c => c.id === tc.category);
                 const icon = cat ? cat.icon : '📌';
-                const statusLabels = {
-                    'not-tested': '⏳ Edilməyib',
-                    'passed': '✅ Keçdi',
-                    'failed': '❌ Uğursuz',
-                    'blocked': '🚫 Bloklanıb',
-                    'retest': '🔄 Retest'
-                };
-                const priorityLabels = {
-                    'critical': '🔴 Critical',
-                    'high': '🟠 High',
-                    'medium': '🔵 Medium',
-                    'low': '⚪ Low'
-                };
                 return `
-                        <tr>
-                            <td>
-                                <label class="checkbox-custom">
-                                    <input type="checkbox" ${tc.status === 'passed' ? 'checked' : ''} 
-                                           onchange="toggleStatus('${tc.tc_id}')" />
-                                    <span class="checkmark"><i class="fas fa-check"></i></span>
-                                </label>
-                            </td>
-                            <td><span class="tc-id">${tc.tc_id}</span></td>
-                            <td>
-                                <div class="tc-title">
-                                    ${tc.title}
-                                    <small>${tc.description || 'Təsvir yoxdur'}</small>
-                                    <span class="tc-category">${icon} ${tc.category}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <select class="td-select" onchange="updateStatus('${tc.tc_id}', this.value)">
-                                    <option value="not-tested" ${tc.status === 'not-tested' ? 'selected' : ''}>⏳ Edilməyib</option>
-                                    <option value="passed" ${tc.status === 'passed' ? 'selected' : ''}>✅ Keçdi</option>
-                                    <option value="failed" ${tc.status === 'failed' ? 'selected' : ''}>❌ Uğursuz</option>
-                                    <option value="blocked" ${tc.status === 'blocked' ? 'selected' : ''}>🚫 Bloklanıb</option>
-                                    <option value="retest" ${tc.status === 'retest' ? 'selected' : ''}>🔄 Retest</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select class="td-select td-select-priority ${tc.priority}" 
-                                        onchange="updatePriority('${tc.tc_id}', this.value)">
-                                    <option value="critical" ${tc.priority === 'critical' ? 'selected' : ''}>🔴 Critical</option>
-                                    <option value="high" ${tc.priority === 'high' ? 'selected' : ''}>🟠 High</option>
-                                    <option value="medium" ${tc.priority === 'medium' ? 'selected' : ''}>🔵 Medium</option>
-                                    <option value="low" ${tc.priority === 'low' ? 'selected' : ''}>⚪ Low</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input class="bug-input" type="text" placeholder="BUG-ID" 
-                                       value="${tc.bug_id || ''}" 
-                                       onchange="updateBug('${tc.tc_id}', this.value)" />
-                            </td>
-                            <td>
-                                <button class="btn-delete" onclick="deleteTestCase('${tc.tc_id}')" title="Sil">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                    <tr>
+                        <td>
+                            <label class="checkbox-custom">
+                                <input type="checkbox" ${tc.status === 'passed' ? 'checked' : ''} 
+                                       onchange="toggleStatus('${tc.tc_id}')" />
+                                <span class="checkmark"><i class="fas fa-check"></i></span>
+                            </label>
+                        </td>
+                        <td><span class="tc-id">${tc.tc_id}</span></td>
+                        <td>
+                            <div class="tc-title">
+                                ${tc.title}
+                                <small>${tc.description || 'Təsvir yoxdur'}</small>
+                                <span class="tc-category">${icon} ${tc.category}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <select class="td-select" onchange="updateStatus('${tc.tc_id}', this.value)">
+                                <option value="not-tested" ${tc.status === 'not-tested' ? 'selected' : ''}>⏳ Edilməyib</option>
+                                <option value="passed" ${tc.status === 'passed' ? 'selected' : ''}>✅ Keçdi</option>
+                                <option value="failed" ${tc.status === 'failed' ? 'selected' : ''}>❌ Uğursuz</option>
+                                <option value="blocked" ${tc.status === 'blocked' ? 'selected' : ''}>🚫 Bloklanıb</option>
+                                <option value="retest" ${tc.status === 'retest' ? 'selected' : ''}>🔄 Retest</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="td-select td-select-priority ${tc.priority}" 
+                                    onchange="updatePriority('${tc.tc_id}', this.value)">
+                                <option value="critical" ${tc.priority === 'critical' ? 'selected' : ''}>🔴 Critical</option>
+                                <option value="high" ${tc.priority === 'high' ? 'selected' : ''}>🟠 High</option>
+                                <option value="medium" ${tc.priority === 'medium' ? 'selected' : ''}>🔵 Medium</option>
+                                <option value="low" ${tc.priority === 'low' ? 'selected' : ''}>⚪ Low</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input class="bug-input" type="text" placeholder="BUG-ID" 
+                                   value="${tc.bug_id || ''}" 
+                                   onchange="updateBug('${tc.tc_id}', this.value)" />
+                        </td>
+                        <td>
+                            <button class="btn-delete" onclick="deleteTestCase('${tc.tc_id}')" title="Sil">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
             }).join('');
         }
 
@@ -1259,16 +1222,16 @@
 
             toast.className = `toast ${type}`;
             toast.innerHTML = `
-                    <i class="fas ${icons[type] || icons.info}"></i>
-                    <div>
-                        <div style="font-weight:600;font-size:14px;color:#1a1a2e;">${title}</div>
-                        <div style="font-size:13px;color:#64748b;">${message}</div>
-                    </div>
-                    <button style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:16px;" 
-                            onclick="this.parentElement.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
+                <i class="fas ${icons[type] || icons.info}"></i>
+                <div>
+                    <div style="font-weight:600;font-size:14px;color:#1a1a2e;">${title}</div>
+                    <div style="font-size:13px;color:#64748b;">${message}</div>
+                </div>
+                <button style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:16px;" 
+                        onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
 
             container.appendChild(toast);
             setTimeout(() => {
@@ -1337,9 +1300,7 @@
                     await addTestCase(data);
                 }
                 closeModal();
-            } catch (error) {
-                // Error already handled
-            }
+            } catch (error) {}
         });
 
         // ============================================================
@@ -1365,6 +1326,7 @@
         loadTestCases();
 
         console.log('✅ NaviMax QA Checklist - Ağ fon yükləndi!');
+        console.log(`📊 Cədvəl: ${TABLE_NAME}`);
         console.log('⌨️ Qısayollar: Ctrl+N (Yeni), Ctrl+F (Axtar), ESC (Bağla)');
     </script>
 
