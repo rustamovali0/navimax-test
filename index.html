@@ -7,9 +7,9 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
     <style>
         * {
@@ -938,12 +938,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 renderCategories();
                 render();
                 
-                if (testCases.length > 0) {
-                    showToast('Uğurlu', `${testCases.length} test case yükləndi`, 'success');
-                } else {
-                    showToast('Info', 'Cədvəl boşdur. Yeni test case əlavə edin!', 'info');
-                }
-
+               
             } catch (error) {
                 console.error('❌ Yükləmə xətası:', error);
                 showToast('Xəta', 'Məlumatlar yüklənərkən xəta baş verdi', 'error');
@@ -964,6 +959,15 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // CRUD OPERATIONS
         // ============================================================
         async function addTestCase(data) {
+            Swal.fire({
+    title: "Əlavə edilir...",
+    text: "Zəhmət olmasa gözləyin",
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    didOpen: () => {
+        Swal.showLoading();
+    }
+});
             try {
                 const maxNum = testCases.reduce((max, t) => {
                     const num = parseInt(t.tc_id.replace('TC-', ''));
@@ -990,17 +994,38 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 testCases.unshift(inserted);
                 renderCategories();
                 render();
-                showToast('Uğurlu', `"${data.title}" əlavə edildi`, 'success');
-                return inserted;
+Swal.close();
+
+Swal.fire({
+    icon: "success",
+    title: "Əlavə edildi",
+    text: `"${data.title}" uğurla əlavə olundu.`,
+    timer: 1800,
+    showConfirmButton: false
+});                return inserted;
 
             } catch (error) {
                 console.error('❌ Əlavə etmə xətası:', error);
-                showToast('Xəta', 'Əlavə edərkən xəta baş verdi', 'error');
-                throw error;
+Swal.close();
+
+Swal.fire({
+    icon: "error",
+    title: "Xəta",
+    text: error.message
+});                throw error;
             }
         }
 
         async function updateTestCase(id, updates) {
+            Swal.fire({
+    title: "Yadda saxlanılır...",
+    text: "Gözləyin",
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    didOpen: () => {
+        Swal.showLoading();
+    }
+});
             try {
 const { data, error } = await supabaseClient
     .from(TABLE_NAME)
@@ -1017,19 +1042,37 @@ const { data, error } = await supabaseClient
                 }
                 renderCategories();
                 render();
-                showToast('Uğurlu', 'Test case yeniləndi', 'success');
-                return data;
+Swal.close();
+
+Toast.fire({
+    icon: "success",
+    title: "Yadda saxlanıldı"
+});                return data;
 
             } catch (error) {
                 console.error('❌ Yeniləmə xətası:', error);
-                showToast('Xəta', 'Yeniləyərkən xəta baş verdi', 'error');
-                throw error;
+Swal.close();
+
+Swal.fire({
+    icon: "error",
+    title: "Xəta",
+    text: error.message
+});                throw error;
             }
         }
 
         async function deleteTestCase(id) {
-            if (!confirm('Bu test case-i silmək istədiyinizə əminsiniz?')) return;
+const result = await Swal.fire({
+    title: "Əminsiniz?",
+    text: "Bu test case silinəcək.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Bəli, sil",
+    cancelButtonText: "Ləğv et",
+    confirmButtonColor: "#d33"
+});
 
+if (!result.isConfirmed) return;
             try {
 const { error } = await supabaseClient
     .from(TABLE_NAME)
@@ -1041,12 +1084,22 @@ const { error } = await supabaseClient
                 testCases = testCases.filter(t => t.tc_id !== id);
                 renderCategories();
                 render();
-                showToast('Uğurlu', 'Test case silindi', 'success');
-
+Swal.fire({
+    icon: "success",
+    title: "Silindi",
+    text: "Test Case uğurla silindi.",
+    timer: 1800,
+    showConfirmButton: false
+});
             } catch (error) {
                 console.error('❌ Silinmə xətası:', error);
-                showToast('Xəta', 'Silərkən xəta baş verdi', 'error');
-            }
+Swal.close();
+
+Swal.fire({
+    icon: "error",
+    title: "Xəta",
+    text: error.message
+});            }
         }
 
         // ============================================================
@@ -1212,35 +1265,21 @@ const { error } = await supabaseClient
         // ============================================================
         // TOAST
         // ============================================================
-        function showToast(title, message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            const icons = {
-                success: 'fa-check-circle',
-                error: 'fa-exclamation-circle',
-                info: 'fa-info-circle'
-            };
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 2500,
+    timerProgressBar: true
+});
 
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <i class="fas ${icons[type] || icons.info}"></i>
-                <div>
-                    <div style="font-weight:600;font-size:14px;color:#1a1a2e;">${title}</div>
-                    <div style="font-size:13px;color:#64748b;">${message}</div>
-                </div>
-                <button style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:16px;" 
-                        onclick="this.parentElement.remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 4000);
-            }, 4000);
-        }
-
+function showToast(title, message = "", type = "success") {
+    Toast.fire({
+        icon: type,
+        title: title,
+        text: message
+    });
+}
         // ============================================================
         // MODAL
         // ============================================================
@@ -1283,8 +1322,16 @@ const { error } = await supabaseClient
             };
 
             if (!data.title) {
-                showToast('Xəta', 'Başlıq daxil edin!', 'error');
-                return;
+if (!data.title) {
+
+    Swal.fire({
+        icon: "warning",
+        title: "Başlıq daxil edin",
+        text: "Test Case adı boş ola bilməz."
+    });
+
+    return;
+}                return;
             }
 
             try {
@@ -1308,8 +1355,16 @@ const { error } = await supabaseClient
         // SEARCH & REFRESH
         // ============================================================
         document.getElementById('searchInput').addEventListener('input', render);
-        document.getElementById('refreshBtn').addEventListener('click', loadTestCases);
+document.getElementById('refreshBtn').addEventListener('click', async () => {
 
+    Toast.fire({
+        icon: "info",
+        title: "Yenilənir..."
+    });
+
+    await loadTestCases();
+
+});
         // ============================================================
         // KEYBOARD SHORTCUTS
         // ============================================================
