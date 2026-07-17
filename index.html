@@ -908,10 +908,10 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             try {
                 console.log(`📊 Cədvəldən oxunur: ${TABLE_NAME}`);
                 
-                const { data, error } = await supabase
-                    .from(TABLE_NAME)
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                const { data, error } = await supabaseClient
+    .from(TABLE_NAME)
+    .select('*')
+    .order('created_at', { ascending: false });
 
                 if (error) {
                     console.error('❌ Supabase xətası:', error);
@@ -970,7 +970,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 }, 0);
                 const tcId = `TC-${String(maxNum + 1).padStart(3, '0')}`;
 
-                const { data: inserted, error } = await supabase
+                const { data: inserted, error } = await supabaseClient
                     .from(TABLE_NAME)
                     .insert([{
                         tc_id: tcId,
@@ -1001,8 +1001,8 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function updateTestCase(id, updates) {
             try {
-                const { data, error } = await supabase
-                    .from(TABLE_NAME)
+const { data, error } = await supabaseClient
+    .from(TABLE_NAME)
                     .update(updates)
                     .eq('tc_id', id)
                     .select()
@@ -1030,8 +1030,8 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             if (!confirm('Bu test case-i silmək istədiyinizə əminsiniz?')) return;
 
             try {
-                const { error } = await supabase
-                    .from(TABLE_NAME)
+const { error } = await supabaseClient
+    .from(TABLE_NAME)
                     .delete()
                     .eq('tc_id', id);
 
