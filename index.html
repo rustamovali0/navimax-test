@@ -43,7 +43,7 @@
             flex-wrap: wrap;
             gap: 12px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-        }
+        }X
 
         .header h1 {
             font-size: 22px;
@@ -1123,7 +1123,7 @@ Swal.fire({
 
         async function updateBug(id, value) {
     await updateTestCase(id, { bug_id: value || null }, false);
-}        }
+}        
 
         // ============================================================
         // RENDER FUNCTIONS
@@ -1322,7 +1322,6 @@ function showToast(title, message = "", type = "success") {
                 bug: document.getElementById('formBug').value.trim()
             };
 
-            if (!data.title) {
 if (!data.title) {
 
     Swal.fire({
